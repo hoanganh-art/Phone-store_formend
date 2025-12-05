@@ -269,10 +269,11 @@ img {
 .logo {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 2px;
     font-size: 28px;
     font-weight: 800;
     color: var(--dark);
+    
 }
 
 .logo-icon {
@@ -281,6 +282,7 @@ img {
     background: var(--gradient-primary);
     border-radius: var(--radius-md);
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     color: white;
@@ -289,7 +291,7 @@ img {
 
 .nav-menu ul {
     display: flex;
-    gap: 32px;
+    gap: 22px;
 }
 
 .nav-link {
@@ -331,7 +333,7 @@ img {
 }
 
 .search-input {
-    width: 300px;
+    width: 200px;
     padding: 12px 48px 12px 20px;
     border-radius: var(--radius-full);
     background: var(--glass-bg);
@@ -347,7 +349,7 @@ img {
     outline: none;
     border-color: var(--primary);
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-    width: 350px;
+    width: 250px;
 }
 
 .search-btn {
@@ -1058,6 +1060,7 @@ img {
     font-size: 24px;
     font-weight: 800;
     margin-bottom: 24px;
+
 }
 
 .footer-logo-icon {
@@ -1636,7 +1639,7 @@ img {
         width: 100%;
         background: var(--light);
         box-shadow: var(--shadow-lg);
-        padding: 24px;
+        padding: 10px;
         transition: left var(--transition-normal);
         z-index: 999;
     }
