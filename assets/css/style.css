@@ -1,6 +1,7 @@
 /* CSS Variables */
 :root {
-    --primary: #2563eb;
+    --primary: #4b4a4a;
+    --primary-base: #2701ff;
     --primary-dark: #1d4ed8;
     --primary-light: #3b82f6;
     --secondary: #8b5cf6;
@@ -319,7 +320,7 @@ img {
 
 .nav-link:hover,
 .nav-link.active {
-    color: var(--primary);
+    color: var(--primary-base);
 }
 
 .header-actions {
