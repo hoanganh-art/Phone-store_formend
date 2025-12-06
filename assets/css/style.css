@@ -1,7 +1,7 @@
 /* CSS Variables */
 :root {
     --primary: #4b4a4a;
-    --primary-base: #2701ff;
+    --primary-base: #c97364;
     --primary-dark: #1d4ed8;
     --primary-light: #3b82f6;
     --secondary: #8b5cf6;
@@ -245,7 +245,7 @@ img {
 
 /* Header */
 .header {
-    position: fixed;
+    position: relative;
     top: 0;
     left: 0;
     width: 100%;

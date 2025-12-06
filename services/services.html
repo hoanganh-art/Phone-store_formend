@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dịch Vụ | PhoneStore - Điện thoại chính hãng cao cấp</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <style>
+        /* Additional styles for services page */
+        .services-page {
+            padding-top: 100px;
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 80px 0;
+            margin-bottom: 60px;
+        }
+
+        .page-title {
+            font-size: 48px;
+            font-weight: 800;
+            margin-bottom: 16px;
+        }
+
+        .page-subtitle {
+            font-size: 18px;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .service-category {
+            margin-bottom: 80px;
+        }
+
+        .category-title {
+            font-size: 32px;
+            margin-bottom: 40px;
+            color: var(--dark);
+            position: relative;
+            padding-bottom: 16px;
+        }
+
+        .category-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            border-radius: 2px;
+        }
+
+        .service-detail-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-xl);
+            padding: 40px;
+            transition: all var(--transition-normal);
+            height: 100%;
+        }
+
+        .service-detail-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary-light);
+        }
+
+        .service-detail-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            font-size: 32px;
+            color: white;
+        }
+
+        .service-detail-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--dark);
+        }
+
+        .service-detail-description {
+            color: var(--gray);
+            margin-bottom: 24px;
+            line-height: 1.8;
+        }
+
+        .service-features {
+            margin-top: 30px;
+        }
+
+        .service-feature {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            color: var(--gray-dark);
+        }
+
+        .service-feature i {
+            color: var(--success);
+            margin-right: 12px;
+            font-size: 14px;
+        }
+
+        .service-price {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--primary);
+            margin: 30px 0;
+        }
+
+        .service-price span {
+            font-size: 16px;
+            color: var(--gray);
+            font-weight: normal;
+        }
+
+        .process-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .process-step {
+            text-align: center;
+            padding: 30px;
+            background: var(--glass-bg);
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--glass-border);
+            position: relative;
+        }
+
+        .step-number {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 20px;
+            margin: 0 auto 20px;
+        }
+
+        .step-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--dark);
+        }
+
+        .step-description {
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        .service-form {
+            background: var(--glass-bg);
+            border-radius: var(--radius-xl);
+            padding: 40px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 20px;
+            border: 1px solid var(--gray-light);
+            border-radius: var(--radius-lg);
+            font-size: 16px;
+            transition: all var(--transition-fast);
+            background: white;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
+        }
+
+        textarea.form-control {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .service-faq {
+            margin-top: 80px;
+        }
+
+        .faq-item {
+            background: var(--glass-bg);
+            border-radius: var(--radius-lg);
+            margin-bottom: 16px;
+            overflow: hidden;
+            border: 1px solid var(--glass-border);
+        }
+
+        .faq-question {
+            padding: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--dark);
+            transition: all var(--transition-fast);
+        }
+
+        .faq-question:hover {
+            background: rgba(var(--primary-rgb), 0.05);
+        }
+
+        .faq-answer {
+            padding: 0 24px;
+            max-height: 0;
+            overflow: hidden;
+            transition: all var(--transition-normal);
+            color: var(--gray);
+            line-height: 1.8;
+        }
+
+        .faq-item.active .faq-answer {
+            padding: 0 24px 24px;
+            max-height: 500px;
+        }
+
+        .faq-toggle {
+            transition: transform var(--transition-normal);
+        }
+
+        .faq-item.active .faq-toggle {
+            transform: rotate(180deg);
+        }
+
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 36px;
+            }
+            
+            .category-title {
+                font-size: 28px;
+            }
+            
+            .service-detail-card {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <span>Phone<span class="text-gradient">Store</span></span>
+                </a>
+
+                <nav class="nav-menu">
+                    <ul>
+                        <li><a href="index.html" class="nav-link active">Trang chủ</a></li>
+                        <li><a href="/home/products.html" class="nav-link">Sản phẩm</a></li>
+                        <li><a href="/home/brands.html" class="nav-link">Thương hiệu</a></li>
+                        <li><a href="/Promotion/Promotion.html" class="nav-link">Khuyến mãi</a></li>
+                        <li><a href="/services/services.html" class="nav-link">Dịch vụ</a></li>
+                        <li><a href="/index.html#contact" class="nav-link">Liên hệ</a></li>
+                    </ul>
+                </nav>
+
+                <div class="header-actions">
+                    <div class="search-container">
+                        <input type="text" class="search-input" placeholder="Tìm kiếm dịch vụ...">
+                        <button class="search-btn">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="theme-toggle" id="theme-toggle">
+                            <i class="fas fa-moon"></i>
+                        </button>
+                        <button class="btn-icon" id="wishlist-btn">
+                            <i class="far fa-heart"></i>
+                            <span class="badge" id="wishlist-count">0</span>
+                        </button>
+                        <button class="btn-icon" id="cart-btn">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span class="badge" id="cart-count">0</span>
+                        </button>
+                        <button class="btn-icon" id="user-btn">
+                            <i class="far fa-user"></i>
+                        </button>
+                    </div>
+
+                    <button class="mobile-toggle" id="mobile-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <div class="container">
+            <div class="text-center">
+                <h1 class="page-title animate__animated animate__fadeInDown">Dịch Vụ Chăm Sóc Khách Hàng</h1>
+                <p class="page-subtitle animate__animated animate__fadeInUp">
+                    PhoneStore cam kết mang đến cho bạn những dịch vụ tốt nhất, từ bảo hành, sửa chữa đến tư vấn và hỗ trợ kỹ thuật
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Content -->
+    <main class="services-page">
+        <div class="container">
+            <!-- Bảo hành & Sửa chữa -->
+            <section class="service-category">
+                <h2 class="category-title">Bảo Hành & Sửa Chữa</h2>
+                <div class="row" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px;">
+                    <div class="service-detail-card animate__animated animate__fadeInLeft">
+                        <div class="service-detail-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h3 class="service-detail-title">Bảo Hành Chính Hãng</h3>
+                        <p class="service-detail-description">
+                            Tất cả sản phẩm tại PhoneStore đều được bảo hành chính hãng từ 12-24 tháng. 
+                            Chúng tôi có mạng lưới trung tâm bảo hành rộng khắp cả nước.
+                        </p>
+                        <div class="service-features">
+                            <div class="service-feature">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Bảo hành 1 đổi 1 trong 30 ngày đầu</span>
+                            </div>
+                            <div class="service-feature">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Hỗ trợ bảo hành tại nhà trong nội thành</span>
+                            </div>
+                            <div class="service-feature">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Thời gian xử lý nhanh chóng: 2-7 ngày</span>
+                            </div>
+                            <div class="service-feature">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Bảo hành phần mềm trọn đời sản phẩm</span>
+                            </div>
+                        </div>
+                        <div class="service-price">
+                            0 đ <span>/ miễn phí trong thời hạn bảo hành</span>
+                        </div>
+                        <button class="btn btn-primary">
+                            <i class="fas fa-calendar-check"></i>
+                            Đăng ký bảo hành
+                        </button>
+                    </div>
+
+                    <div class="service-detail-card animate__animated animate__fadeInRight">
+                        <div class="service-detail-icon">
+                            <i class="fas fa-tools"></i>
+                        </div>
+                        <h3 class="service-detail-title">Sửa Chữa Chuyên Nghiệp</h3>
+                        <p class="service-detail-description">
+                            Dịch vụ sửa chữa với đội ngũ kỹ thuật viên được đào tạo chuyên sâu, 
+                            sử dụng linh kiện chính hãng và thiết bị hiện đại.
+                        </p>
+                        <div class="service-features">
+                            <div class="service-feature">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Sửa chữa mọi hãng: Apple, Samsung, Xiaomi, OPPO, ...</span>
+                            </div>
+                            <div class="service-feature">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Báo giá trước khi sửa chữa, minh bạch chi phí</span>
+                            </div>
+                            <div class="service-feature">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Thay thế linh kiện chính hãng, có sẵn</span>
+                            </div>
+                            <div class="service-feature">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Bảo hành 6 tháng cho dịch vụ sửa chữa</span>
+                            </div>
+                        </div>
+                        <div class="service-price">
+                            Từ 150.000 đ <span>/ tùy vào tình trạng thiết bị</span>
+                        </div>
+                        <button class="btn btn-secondary">
+                            <i class="fas fa-phone-alt"></i>
+                            Liên hệ tư vấn
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Quy trình sửa chữa -->
+                <div class="process-steps">
+                    <div class="process-step animate__animated animate__fadeInUp">
+                        <div class="step-number">1</div>
+                        <h4 class="step-title">Tiếp nhận & Chẩn đoán</h4>
+                        <p class="step-description">
+                            Kiểm tra, chẩn đoán nguyên nhân và báo giá chi tiết
+                        </p>
+                    </div>
+                    <div class="process-step animate__animated animate__fadeInUp" style="animation-delay: 0.1s;">
+                        <div class="step-number">2</div>
+                        <h4 class="step-title">Xác nhận & Sửa chữa</h4>
+                        <p class="step-description">
+                            Khách hàng xác nhận, tiến hành sửa chữa với linh kiện chính hãng
+                        </p>
+                    </div>
+                    <div class="process-step animate__animated animate__fadeInUp" style="animation-delay: 0.2s;">
+                        <div class="step-number">3</div>
+                        <h4 class="step-title">Kiểm tra chất lượng</h4>
+                        <p class="step-description">
+                            Kiểm tra kỹ thuật nghiêm ngặt trước khi bàn giao
+                        </p>
+                    </div>
+                    <div class="process-step animate__animated animate__fadeInUp" style="animation-delay: 0.3s;">
+                        <div class="step-number">4</div>
+                        <h4 class="step-title">Bàn giao & Bảo hành</h4>
+                        <p class="step-description">
+                            Bàn giao sản phẩm và bảo hành dịch vụ 6 tháng
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Hỗ trợ & Tư vấn -->
+            <section class="service-category">
+                <h2 class="category-title">Hỗ Trợ & Tư Vấn</h2>
+                <div class="row" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px;">
+                    <div class="service-detail-card animate__animated animate__fadeInLeft">
+                        <div class="service-detail-icon">
+                            <i class="fas fa-headset"></i>
+                        </div>
+                        <h3 class="service-detail-title">Hỗ Trợ Kỹ Thuật 24/7</h3>
+                        <p class="service-detail-description">
+                            Đội ngũ chuyên gia kỹ thuật luôn sẵn sàng hỗ trợ bạn giải quyết mọi vấn đề 
+                            về sản phẩm và dịch vụ, bất kể ngày đêm.
+                        </p>
+                        <div class="service-features">
+                            <div class="service-feature">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Hotline: 1900 1234 (Miễn phí)</span>
+                            </div>
+                            <div class="service-feature">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Zalo OA: @phonestore</span>
+                            </div>
+                            <div class="service-feature">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Chat trực tuyến trên website</span>
+                            </div>
+                            <div class="service-feature">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Email: support@phonestore.vn</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary">
+                            <i class="fas fa-phone-alt"></i>
+                            Gọi ngay 1900 1234
+                        </button>
+                    </div>
+
+                    <div class="service-detail-card animate__animated animate__fadeInRight">
+                        <div class="service-detail-icon">
+                            <i class="fas fa-user-cog"></i>
+                        </div>
+                        <h3 class="service-detail-title">Tư Vấn Chọn Mua</h3>
+                        <p class="service-detail-description">
+                            Chuyên gia tư vấn giúp bạn chọn được sản phẩm phù hợp nhất với nhu cầu 
+                            và ngân sách, dựa trên phân tích thói quen sử dụng.
+                        </p>
+                        <div class="service-features">
+                            <div class="service-feature">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Phân tích nhu cầu sử dụng</span>
+                            </div>
+                            <div class="service-feature">
+                                <i class="fas fa-check-circle"></i>
+                                <span>So sánh tính năng, giá cả</span>
+                            </div>
+                            <div class="service-feature">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Tư vấn trả góp lãi suất 0%</span>
+                            </div>
+                            <div class="service-feature">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Hỗ trợ đặt hàng và giao nhận</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-secondary">
+                            <i class="fas fa-comments"></i>
+                            Yêu cầu tư vấn
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Dịch vụ khác -->
+            <section class="service-category">
+                <h2 class="category-title">Dịch Vụ Khác</h2>
+                <div class="row" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px;">
+                    <div class="service-detail-card animate__animated animate__fadeInLeft">
+                        <div class="service-detail-icon">
+                            <i class="fas fa-sync-alt"></i>
+                        </div>
+                        <h3 class="service-detail-title">Đổi Trả & Hoàn Tiền</h3>
+                        <p class="service-detail-description">
+                            Chính sách đổi trả linh hoạt trong vòng 7 ngày nếu sản phẩm có lỗi 
+                            từ nhà sản xuất. Hoàn tiền 100% trong trường hợp cần thiết.
+                        </p>
+                        <div class="service-features">
+                            <div class="service-feature">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Đổi trả trong 7 ngày nếu có lỗi kỹ thuật</span>
+                            </div>
+                            <div class="service-feature">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Hoàn tiền 100% trong vòng 3 ngày làm việc</span>
+                            </div>
+                            <div class="service-feature">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Miễn phí đổi trả tại cửa hàng</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-outline">
+                            <i class="fas fa-file-contract"></i>
+                            Xem chính sách chi tiết
+                        </button>
+                    </div>
+
+                    <div class="service-detail-card animate__animated animate__fadeInRight">
+                        <div class="service-detail-icon">
+                            <i class="fas fa-gift"></i>
+                        </div>
+                        <h3 class="service-detail-title">Dịch Vụ Hậu Mãi</h3>
+                        <p class="service-detail-description">
+                            Nhiều ưu đãi đặc biệt dành cho khách hàng thân thiết: 
+                            giảm giá phụ kiện, tặng gói bảo hành mở rộng, dịch vụ vệ sinh miễn phí.
+                        </p>
+                        <div class="service-features">
+                            <div class="service-feature">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Vệ sinh, bảo dưỡng miễn phí định kỳ</span>
+                            </div>
+                            <div class="service-feature">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Tặng gói bảo hành mở rộng 6 tháng</span>
+                            </div>
+                            <div class="service-feature">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Giảm 20% phụ kiện chính hãng</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-outline">
+                            <i class="fas fa-crown"></i>
+                            Đăng ký thành viên VIP
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Form đăng ký dịch vụ -->
+            <section class="service-category">
+                <h2 class="category-title">Đăng Ký Dịch Vụ</h2>
+                <div class="service-form animate__animated animate__fadeInUp">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
+                        <div>
+                            <h3 style="font-size: 28px; margin-bottom: 20px;">Yêu Cầu Dịch Vụ</h3>
+                            <p style="color: var(--gray); margin-bottom: 30px;">
+                                Điền thông tin để chúng tôi có thể liên hệ và tư vấn dịch vụ phù hợp nhất cho bạn.
+                            </p>
+                            <div class="contact-info" style="margin-top: 40px;">
+                                <div style="display: flex; align-items: center; margin-bottom: 16px;">
+                                    <i class="fas fa-phone" style="color: var(--primary); margin-right: 12px;"></i>
+                                    <span>Hotline: 1900 1234</span>
+                                </div>
+                                <div style="display: flex; align-items: center; margin-bottom: 16px;">
+                                    <i class="fas fa-envelope" style="color: var(--primary); margin-right: 12px;"></i>
+                                    <span>Email: services@phonestore.vn</span>
+                                </div>
+                                <div style="display: flex; align-items: center;">
+                                    <i class="fas fa-clock" style="color: var(--primary); margin-right: 12px;"></i>
+                                    <span>Thời gian làm việc: 8:00 - 22:00 (T2 - CN)</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <form id="service-request-form">
+                                <div class="form-group">
+                                    <label class="form-label" for="fullname">Họ và tên *</label>
+                                    <input type="text" class="form-control" id="fullname" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="phone">Số điện thoại *</label>
+                                    <input type="tel" class="form-control" id="phone" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="email">Email</label>
+                                    <input type="email" class="form-control" id="email">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="service-type">Loại dịch vụ *</label>
+                                    <select class="form-control" id="service-type" required>
+                                        <option value="">Chọn dịch vụ</option>
+                                        <option value="warranty">Đăng ký bảo hành</option>
+                                        <option value="repair">Yêu cầu sửa chữa</option>
+                                        <option value="consult">Tư vấn sản phẩm</option>
+                                        <option value="other">Dịch vụ khác</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="message">Nội dung yêu cầu *</label>
+                                    <textarea class="form-control" id="message" rows="4" required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                                    <i class="fas fa-paper-plane"></i>
+                                    Gửi yêu cầu
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- FAQ -->
+            <section class="service-faq">
+                <h2 class="category-title">Câu Hỏi Thường Gặp</h2>
+                <div class="faq-list">
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span>Sản phẩm được bảo hành trong bao lâu?</span>
+                            <i class="fas fa-chevron-down faq-toggle"></i>
+                        </div>
+                        <div class="faq-answer">
+                            Thời gian bảo hành tùy thuộc vào từng sản phẩm và hãng sản xuất. Thông thường: iPhone 12 tháng, Samsung 24 tháng, Xiaomi 12-24 tháng. Chi tiết được ghi rõ trên phiếu bảo hành và hóa đơn mua hàng.
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span>Tôi có thể đổi trả sản phẩm trong trường hợp nào?</span>
+                            <i class="fas fa-chevron-down faq-toggle"></i>
+                        </div>
+                        <div class="faq-answer">
+                            Bạn có thể đổi trả sản phẩm trong vòng 7 ngày nếu: 1) Sản phẩm có lỗi kỹ thuật từ nhà sản xuất, 2) Sản phẩm không đúng với mô tả, 3) Sản phẩm bị hư hỏng trong quá trình vận chuyển. Sản phẩm phải còn nguyên tem, hộp và đầy đủ phụ kiện.
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span>Thời gian sửa chữa mất bao lâu?</span>
+                            <i class="fas fa-chevron-down faq-toggle"></i>
+                        </div>
+                        <div class="faq-answer">
+                            Thời gian sửa chữa phụ thuộc vào tình trạng và loại lỗi: Lỗi phần mềm: 1-2 giờ, Thay màn hình: 1-2 giờ, Thay mainboard: 3-7 ngày (tùy vào việc có linh kiện sẵn). Chúng tôi sẽ báo thời gian cụ thể sau khi chẩn đoán.
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span>Có hỗ trợ sửa chữa tại nhà không?</span>
+                            <i class="fas fa-chevron-down faq-toggle"></i>
+                        </div>
+                        <div class="faq-answer">
+                            Có, chúng tôi hỗ trợ sửa chữa tại nhà cho khách hàng trong nội thành Hà Nội và TP.HCM với phí dịch vụ 150.000đ. Dịch vụ này áp dụng cho các lỗi đơn giản có thể khắc phục tại chỗ.
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span>Tôi cần chuẩn bị gì khi mang máy đi bảo hành?</span>
+                            <i class="fas fa-chevron-down faq-toggle"></i>
+                        </div>
+                        <div class="faq-answer">
+                            Khi mang máy đi bảo hành, vui lòng mang theo: 1) Sản phẩm cần bảo hành, 2) Phiếu bảo hành chính hãng, 3) Hóa đơn mua hàng, 4) Các phụ kiện đi kèm (sạc, cáp, tai nghe...), 5) Sao lưu dữ liệu trước khi gửi bảo hành.
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer" id="contact">
+        <!-- Same footer as index.html -->
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-logo">
+                        <div class="footer-logo-icon">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <span>PhoneStore</span>
+                    </div>
+                    <p class="footer-description">
+                        PhoneStore - Địa chỉ tin cậy cho những chiếc điện thoại thông minh chính hãng.
+                        Cam kết chất lượng, giá cả cạnh tranh và dịch vụ hoàn hảo.
+                    </p>
+                    <div class="social-links">
+                        <a href="#" class="social-link">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="social-link">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="social-link">
+                            <i class="fab fa-tiktok"></i>
+                        </a>
+                        <a href="#" class="social-link">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="footer-col">
+                    <h4 class="footer-heading">Liên kết nhanh</h4>
+                    <ul class="footer-links">
+                        <li><a href="index.html">
+                                <i class="fas fa-chevron-right"></i>
+                                Trang chủ
+                            </a></li>
+                        <li><a href="products.html">
+                                <i class="fas fa-chevron-right"></i>
+                                Sản phẩm
+                            </a></li>
+                        <li><a href="brands.html">
+                                <i class="fas fa-chevron-right"></i>
+                                Thương hiệu
+                            </a></li>
+                        <li><a href="index.html#promotions">
+                                <i class="fas fa-chevron-right"></i>
+                                Khuyến mãi
+                            </a></li>
+                        <li><a href="services.html" class="active">
+                                <i class="fas fa-chevron-right"></i>
+                                Dịch vụ
+                            </a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4 class="footer-heading">Hỗ trợ khách hàng</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">
+                                <i class="fas fa-chevron-right"></i>
+                                Chính sách bảo hành
+                            </a></li>
+                        <li><a href="#">
+                                <i class="fas fa-chevron-right"></i>
+                                Hướng dẫn mua hàng
+                            </a></li>
+                        <li><a href="#">
+                                <i class="fas fa-chevron-right"></i>
+                                Câu hỏi thường gặp
+                            </a></li>
+                        <li><a href="#">
+                                <i class="fas fa-chevron-right"></i>
+                                Chính sách đổi trả
+                            </a></li>
+                        <li><a href="#">
+                                <i class="fas fa-chevron-right"></i>
+                                Liên hệ
+                            </a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4 class="footer-heading">Liên hệ</h4>
+                    <ul class="contact-info">
+                        <li>
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>123 Nguyễn Văn Linh, Quận 7, TP.HCM</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-phone"></i>
+                            <span>1900 1234</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-envelope"></i>
+                            <span>info@phonestore.vn</span>
+                        </li>
+                    </ul>
+                    <div class="newsletter">
+                        <h4>Nhận tin khuyến mãi</h4>
+                        <p>Đăng ký để nhận thông tin khuyến mãi mới nhất</p>
+                        <div class="newsletter-form">
+                            <input type="email" placeholder="Email của bạn">
+                            <button type="submit">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <div class="copyright">
+                    &copy; 2024 PhoneStore. All rights reserved.
+                </div>
+                <div class="payment-methods">
+                    <i class="fab fa-cc-visa"></i>
+                    <i class="fab fa-cc-mastercard"></i>
+                    <i class="fab fa-cc-paypal"></i>
+                    <i class="fab fa-cc-apple-pay"></i>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // Reuse the same JavaScript from index.html for header functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Theme toggle
+            const themeToggle = document.getElementById('theme-toggle');
+            themeToggle.addEventListener('click', () => {
+                document.body.classList.toggle('dark-theme');
+                const icon = themeToggle.querySelector('i');
+                if (document.body.classList.contains('dark-theme')) {
+                    icon.className = 'fas fa-sun';
+                } else {
+                    icon.className = 'fas fa-moon';
+                }
+            });
+
+            // Mobile menu toggle
+            const mobileToggle = document.getElementById('mobile-toggle');
+            const navMenu = document.querySelector('.nav-menu');
+            mobileToggle.addEventListener('click', () => {
+                navMenu.classList.toggle('active');
+            });
+
+            // FAQ functionality
+            const faqItems = document.querySelectorAll('.faq-item');
+            faqItems.forEach(item => {
+                const question = item.querySelector('.faq-question');
+                question.addEventListener('click', () => {
+                    item.classList.toggle('active');
+                });
+            });
+
+            // Service request form
+            const serviceForm = document.getElementById('service-request-form');
+            if (serviceForm) {
+                serviceForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    // Get form data
+                    const formData = {
+                        fullname: document.getElementById('fullname').value,
+                        phone: document.getElementById('phone').value,
+                        email: document.getElementById('email').value,
+                        serviceType: document.getElementById('service-type').value,
+                        message: document.getElementById('message').value
+                    };
+                    
+                    // Here you would normally send this to a server
+                    console.log('Service request submitted:', formData);
+                    
+                    // Show success message
+                    alert('Cảm ơn bạn đã gửi yêu cầu dịch vụ! Chúng tôi sẽ liên hệ với bạn trong thời gian sớm nhất.');
+                    
+                    // Reset form
+                    serviceForm.reset();
+                });
+            }
+
+            // Update cart and wishlist counts
+            function updateBadges() {
+                const cart = JSON.parse(localStorage.getItem('cart')) || [];
+                const wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+                
+                const totalCartItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+                document.getElementById('cart-count').textContent = totalCartItems;
+                document.getElementById('wishlist-count').textContent = wishlist.length;
+            }
+            
+            updateBadges();
+            
+            // Cart and wishlist buttons functionality
+            const cartBtn = document.getElementById('cart-btn');
+            const wishlistBtn = document.getElementById('wishlist-btn');
+            
+            cartBtn.addEventListener('click', () => {
+                window.location.href = 'index.html#cart';
+            });
+            
+            wishlistBtn.addEventListener('click', () => {
+                window.location.href = 'index.html#wishlist';
+            });
+
+            // User button functionality
+            const userBtn = document.getElementById('user-btn');
+            userBtn.addEventListener('click', () => {
+                const currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
+                if (currentUser) {
+                    alert(`Xin chào, ${currentUser.name}!`);
+                } else {
+                    window.location.href = 'login_register.html';
+                }
+            });
+
+            // Search functionality
+            const searchInput = document.querySelector('.search-input');
+            const searchBtn = document.querySelector('.search-btn');
+            
+            function performSearch() {
+                const query = searchInput.value.trim().toLowerCase();
+                if (!query) return;
+                
+                // Redirect to products page with search query
+                window.location.href = `products.html?search=${encodeURIComponent(query)}`;
+            }
+            
+            searchBtn.addEventListener('click', performSearch);
+            searchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    performSearch();
+                }
+            });
+
+            // Animate elements on scroll
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('animate__animated', 'animate__fadeInUp');
+                    }
+                });
+            }, observerOptions);
+
+            // Observe service cards
+            document.querySelectorAll('.service-detail-card, .process-step').forEach(card => {
+                observer.observe(card);
+            });
+        });
+    </script>
+</body>
+
+</html>
