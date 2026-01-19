@@ -1358,6 +1358,113 @@ img {
     gap: 20px;
     padding: 24px 0;
     border-bottom: 1px solid var(--gray-light);
+    align-items: flex-start;
+}
+
+.cart-item img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+
+.cart-item-info {
+    flex: 1;
+}
+
+.cart-item-info h4 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    line-height: 1.4;
+}
+
+.cart-item-price {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--primary);
+    margin-bottom: 12px;
+}
+
+.cart-item-quantity {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.qty-btn {
+    width: 32px;
+    height: 32px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+}
+
+.qty-btn:hover {
+    background: var(--primary);
+    color: white;
+}
+
+.cart-item-quantity input {
+    width: 50px;
+    padding: 8px;
+    text-align: center;
+    border: 1px solid var(--gray-light);
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+.cart-item-total {
+    text-align: right;
+}
+
+.cart-item-total p {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 12px;
+}
+
+.btn-remove {
+    background: none;
+    border: none;
+    color: var(--danger);
+    cursor: pointer;
+    font-size: 16px;
+    transition: color var(--transition-normal);
+}
+
+.btn-remove:hover {
+    color: var(--danger-dark);
+}
+
+.empty-cart {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    text-align: center;
+}
+
+.empty-cart i {
+    font-size: 64px;
+    color: var(--gray-light);
+    margin-bottom: 16px;
+}
+
+.empty-cart p {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--gray-dark);
+    margin-bottom: 8px;
 }
 
 .cart-item:last-child {
