@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test API Connection</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 3px solid #4f46e5;
+            padding-bottom: 10px;
+        }
+        button {
+            background: #4f46e5;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #4338ca;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f9fafb;
+            border-left: 4px solid #10b981;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        .error {
+            border-left-color: #ef4444 !important;
+            background: #fef2f2 !important;
+        }
+        .product-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        .product-name {
+            font-weight: bold;
+            font-size: 18px;
+            color: #1f2937;
+        }
+        .product-price {
+            color: #4f46e5;
+            font-size: 20px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .product-info {
+            color: #6b7280;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test Kết nối API - Phone Store</h1>
+        
+        <div>
+            <button onclick="testConnection()">🔌 Test Kết nối</button>
+            <button onclick="loadProducts()">📦 Load Sản phẩm</button>
+            <button onclick="showProductsNice()">✨ Hiển thị đẹp</button>
+            <button onclick="clearResult()">🗑️ Xóa</button>
+        </div>
+        
+        <div id="result"></div>
+    </div>
+
+    <script>
+        const API_URL = 'http://127.0.0.1:6345/api/products';
+        let productsData = null;
+
+        async function testConnection() {
+            const result = document.getElementById('result');
+            result.className = '';
+            result.textContent = '⏳ Đang kiểm tra kết nối...';
+            
+            try {
+                const response = await fetch(API_URL);
+                const data = await response.json();
+                
+                result.className = '';
+                result.textContent = `✅ KẾT NỐI THÀNH CÔNG!\n\n` +
+                    `Status: ${response.status} ${response.statusText}\n` +
+                    `Success: ${data.success}\n` +
+                    `Message: ${data.message}\n` +
+                    `Số sản phẩm: ${data.data?.data?.length || 0}\n\n` +
+                    `Full Response:\n${JSON.stringify(data, null, 2)}`;
+                
+                productsData = data;
+            } catch (error) {
+                result.className = 'error';
+                result.textContent = `❌ LỖI KẾT NỐI!\n\n${error.message}\n\n` +
+                    `Kiểm tra:\n` +
+                    `1. Backend server có đang chạy không?\n` +
+                    `2. URL có đúng không: ${API_URL}\n` +
+                    `3. CORS có được cấu hình đúng không?`;
+            }
+        }
+
+        async function loadProducts() {
+            const result = document.getElementById('result');
+            result.className = '';
+            result.textContent = '⏳ Đang tải sản phẩm...';
+            
+            try {
+                const response = await fetch(API_URL);
+                const data = await response.json();
+                
+                if (data.success && data.data && data.data.data) {
+                    const products = data.data.data;
+                    productsData = products;
+                    
+                    let output = `✅ ĐÃ TẢI ${products.length} SẢN PHẨM\n\n`;
+                    
+                    products.forEach((product, index) => {
+                        output += `${index + 1}. ${product.product_name}\n`;
+                        output += `   ID: ${product.id}\n`;
+                        output += `   Thương hiệu: ${product.brand?.brand_name || 'N/A'}\n`;
+                        output += `   Giá: ${formatPrice(product.price)}\n`;
+                        output += `   Giá vốn: ${formatPrice(product.cost_price)}\n`;
+                        output += `   Tồn kho: ${product.stock}\n`;
+                        output += `   RAM: ${product.ram || 'N/A'}\n`;
+                        output += `   Storage: ${product.storage || 'N/A'}\n`;
+                        output += `   Trạng thái: ${product.status}\n\n`;
+                    });
+                    
+                    result.textContent = output;
+                } else {
+                    result.className = 'error';
+                    result.textContent = '❌ Không tìm thấy dữ liệu sản phẩm trong response';
+                }
+            } catch (error) {
+                result.className = 'error';
+                result.textContent = `❌ LỖI: ${error.message}`;
+            }
+        }
+
+        function showProductsNice() {
+            if (!productsData || productsData.length === 0) {
+                loadProducts().then(() => {
+                    if (productsData) displayNiceProducts();
+                });
+                return;
+            }
+            displayNiceProducts();
+        }
+
+        function displayNiceProducts() {
+            const result = document.getElementById('result');
+            result.className = '';
+            
+            let html = '<h2>📱 Danh sách sản phẩm</h2>';
+            
+            productsData.forEach(product => {
+                const price = parseFloat(product.price || 0);
+                const costPrice = parseFloat(product.cost_price || 0);
+                const hasDiscount = costPrice > price;
+                
+                html += `
+                    <div class="product-card">
+                        <div class="product-name">${product.product_name}</div>
+                        <div class="product-price">
+                            ${formatPrice(price)}
+                            ${hasDiscount ? `<span style="text-decoration: line-through; color: #9ca3af; font-size: 14px; margin-left: 10px;">${formatPrice(costPrice)}</span>` : ''}
+                        </div>
+                        <div class="product-info">
+                            🏷️ ${product.brand?.brand_name || 'N/A'} | 
+                            📦 Kho: ${product.stock} | 
+                            ${product.ram ? `💾 ${product.ram}` : ''} 
+                            ${product.storage ? `📱 ${product.storage}` : ''} |
+                            ${product.status === 'Available' ? '✅ Còn hàng' : '❌ Hết hàng'}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            result.innerHTML = html;
+        }
+
+        function formatPrice(price) {
+            if (!price) return 'Liên hệ';
+            const numPrice = parseFloat(price);
+            return new Intl.NumberFormat('vi-VN', {
+                style: 'currency',
+                currency: 'VND'
+            }).format(numPrice);
+        }
+
+        function clearResult() {
+            document.getElementById('result').textContent = '';
+            document.getElementById('result').className = '';
+        }
+
+        // Auto test khi load trang
+        window.onload = function() {
+            testConnection();
+        };
+    </script>
+</body>
+</html>

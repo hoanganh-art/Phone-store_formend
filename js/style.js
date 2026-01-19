@@ -1,20 +1,21 @@
 // CẤU HÌNH API
 const API_BASE_URL = "http://127.0.0.1:6345";
-const USE_API = false; // Đặt false để sử dụng dữ liệu tĩnh, true để dùng API
+const USE_API = true; // Đặt false để sử dụng dữ liệu tĩnh, true để dùng API
+const AUTO_REFRESH_INTERVAL = 1000; // Tự động làm mới mỗi 1 giây (1000ms)
 
 const API_ENDPOINTS = {
     PRODUCTS: {
         GET_ALL: `${API_BASE_URL}/api/products`,
         GET_BY_ID: (id) => `${API_BASE_URL}/api/products/${id}`,
-        GET_STATS: `${API_BASE_URL}/products/stats`,
-        GET_BRANDS: `${API_BASE_URL}/products/brands`,
-        GET_CATEGORIES: `${API_BASE_URL}/products/categories`,
-        GET_FILTER_OPTIONS: `${API_BASE_URL}/products/filter-options`,
-        SEARCH: (keyword) => `${API_BASE_URL}/products?search=${keyword}`,
-        FILTER_BY_BRAND: (brandId) => `${API_BASE_URL}/products?brand=${brandId}`,
-        FILTER_BY_CATEGORY: (categoryId) => `${API_BASE_URL}/products?category=${categoryId}`
+        GET_STATS: `${API_BASE_URL}/api/products/stats`,
+        GET_BRANDS: `${API_BASE_URL}/api/brands`,
+        GET_CATEGORIES: `${API_BASE_URL}/api/categories`,
+        GET_FILTER_OPTIONS: `${API_BASE_URL}/api/products/filter-options`,
+        SEARCH: (keyword) => `${API_BASE_URL}/api/products?search=${keyword}`,
+        FILTER_BY_BRAND: (brandId) => `${API_BASE_URL}/api/products?brand=${brandId}`,
+        FILTER_BY_CATEGORY: (categoryId) => `${API_BASE_URL}/api/products?category=${categoryId}`
     },
-    products: `${API_BASE_URL}/products`
+    products: `${API_BASE_URL}/api/products`
 };
 
 // DỮ LIỆU DỰ PHÒNG (Fallback data khi API không hoạt động)
@@ -127,8 +128,11 @@ async function fetchAPI(endpoint, options = {}) {
     }
 }
 
+// Biến lưu interval ID để có thể clear khi cần
+let autoRefreshIntervalId = null;
+
 // Lấy và hiển thị sản phẩm từ API
-async function loadProducts(filter = {}) {
+async function loadProducts(filter = {}, showLoading = true) {
     console.log('Đang tải sản phẩm...', filter);
     
     const productsGrid = document.getElementById('products-grid');
@@ -137,13 +141,15 @@ async function loadProducts(filter = {}) {
         return;
     }
     
-    // Hiển thị loading
-    productsGrid.innerHTML = `
-        <div class="loading-products">
-            <i class="fas fa-spinner fa-spin"></i>
-            <p>Đang tải sản phẩm...</p>
-        </div>
-    `;
+    // Hiển thị loading (chỉ khi cần, không hiển thị khi auto-refresh)
+    if (showLoading) {
+        productsGrid.innerHTML = `
+            <div class="loading-products">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Đang tải sản phẩm...</p>
+            </div>
+        `;
+    }
     
     // Nếu không sử dụng API, dùng dữ liệu tĩnh
     if (!USE_API) {
@@ -172,15 +178,40 @@ async function loadProducts(filter = {}) {
         
         const result = await fetchAPI(url);
         
+        console.log('🔍 Debug - result:', result);
+        console.log('🔍 Debug - result.data:', result.data);
+        
         if (result.success && result.data) {
-            // API có thể trả về dạng { data: [...] } hoặc trực tiếp mảng
-            const products = result.data.data || result.data || [];
-            console.log('Đã tải được', products.length, 'sản phẩm từ API');
+            // fetchAPI trả về: { success: true, data: responseBody }
+            // responseBody từ Laravel: { success: true, data: { data: [...products...], current_page, ... } }
+            let products = [];
+            
+            // Case 1: Response có cấu trúc { success: true, data: { data: [...] } }
+            if (result.data.success && result.data.data && result.data.data.data) {
+                products = result.data.data.data;
+                console.log('✅ Case 1: Laravel pagination format');
+            }
+            // Case 2: Response có cấu trúc { data: { data: [...] } }
+            else if (result.data.data && Array.isArray(result.data.data)) {
+                products = result.data.data;
+                console.log('✅ Case 2: Nested data format');
+            }
+            // Case 3: Response là mảng trực tiếp { data: [...] }
+            else if (Array.isArray(result.data)) {
+                products = result.data;
+                console.log('✅ Case 3: Direct array format');
+            }
+            
+            console.log('✅ Đã tải được', products.length, 'sản phẩm từ API');
+            if (products.length > 0) {
+                console.log('📦 Sản phẩm đầu tiên:', products[0]);
+            }
+            
             displayProducts(products);
             updateProductCount(products.length);
         } else {
             // Sử dụng fallback data khi API lỗi
-            console.warn('API lỗi, sử dụng dữ liệu dự phòng');
+            console.warn('⚠️ API lỗi, sử dụng dữ liệu dự phòng');
             displayProducts(FALLBACK_PRODUCTS);
             updateProductCount(FALLBACK_PRODUCTS.length);
             showNotification('Đang sử dụng dữ liệu demo (API không khả dụng)', 'warning');
@@ -217,17 +248,25 @@ function displayProducts(products) {
         const productId = product.id || product.product_id;
         const productName = product.product_name || product.name || 'Không có tên';
         const brandName = product.brand?.brand_name || product.brand_name || product.brand || 'Unknown';
-        const price = product.price || product.sale_price || 0;
-        const originalPrice = product.original_price || product.base_price;
+        
+        // Chuyển đổi giá: API trả về string "30000.00", cần parse thành số
+        let price = parseFloat(product.price || product.sale_price || 0);
+        let originalPrice = parseFloat(product.original_price || product.base_price || product.cost_price || 0);
+        
         const imageUrl = product.image || product.image_url || product.thumbnail || 
                         'https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=400&h=400&fit=crop';
-        const stock = product.stock || product.quantity || product.in_stock || 0;
+        const stock = parseInt(product.stock || product.quantity || product.in_stock || 0);
         const ram = product.ram || '';
         const storage = product.storage || '';
+        const status = product.status || 'Available';
+        
+        // Tính giá khuyến mãi nếu có
+        const hasDiscount = originalPrice > price;
         
         return `
         <div class="product-card" data-id="${productId}">
             ${product.badge ? `<div class="product-badge">${product.badge}</div>` : ''}
+            ${hasDiscount ? `<div class="product-badge" style="background: #ef4444;">Giảm giá</div>` : ''}
             <button class="product-wishlist" data-id="${productId}">
                 <i class="far fa-heart"></i>
             </button>
@@ -591,6 +630,32 @@ function searchProducts(keyword) {
     loadProducts({ search: keyword });
 }
 
+// Hàm bật tự động làm mới
+function startAutoRefresh() {
+    // Xóa interval cũ nếu có
+    if (autoRefreshIntervalId) {
+        clearInterval(autoRefreshIntervalId);
+    }
+    
+    // Chỉ bật auto-refresh khi sử dụng API
+    if (USE_API && AUTO_REFRESH_INTERVAL > 0) {
+        autoRefreshIntervalId = setInterval(() => {
+            console.log('🔄 Auto-refresh: Đang cập nhật dữ liệu...');
+            loadProducts({}, false); // false = không hiển thị loading spinner
+        }, AUTO_REFRESH_INTERVAL);
+        console.log(`✅ Auto-refresh đã bật: Làm mới mỗi ${AUTO_REFRESH_INTERVAL/1000} giây`);
+    }
+}
+
+// Hàm tắt tự động làm mới
+function stopAutoRefresh() {
+    if (autoRefreshIntervalId) {
+        clearInterval(autoRefreshIntervalId);
+        autoRefreshIntervalId = null;
+        console.log('⏹️ Auto-refresh đã tắt');
+    }
+}
+
 // Tự động chạy khi trang tải xong
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM đã sẵn sàng, bắt đầu tải sản phẩm...');
@@ -599,8 +664,11 @@ document.addEventListener('DOMContentLoaded', function() {
     updateCartCount();
     updateWishlistCount();
     
-    // Tải sản phẩm
+    // Tải sản phẩm lần đầu
     loadProducts();
+    
+    // Bật auto-refresh
+    startAutoRefresh();
     
     // Thêm event listener cho tìm kiếm
     const searchInput = document.querySelector('.search-input');
@@ -617,6 +685,22 @@ document.addEventListener('DOMContentLoaded', function() {
             if (e.key === 'Enter' && searchInput.value.trim()) {
                 searchProducts(searchInput.value.trim());
             }
+        });
+    }
+    
+    // Thêm event listener cho nút làm mới
+    const refreshBtn = document.getElementById('refresh-products');
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', () => {
+            console.log('🔄 Làm mới sản phẩm thủ công...');
+            refreshBtn.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> Đang tải...';
+            refreshBtn.disabled = true;
+            
+            loadProducts().then(() => {
+                refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Làm mới';
+                refreshBtn.disabled = false;
+                showNotification('Đã cập nhật danh sách sản phẩm!', 'success');
+            });
         });
     }
     
