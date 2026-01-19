@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Giỏ hàng</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 10px 5px;
+            cursor: pointer;
+            border: none;
+            background: #4f46e5;
+            color: white;
+            border-radius: 4px;
+        }
+        button:hover {
+            background: #4338ca;
+        }
+        .result {
+            background: #f0f0f0;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .success {
+            color: green;
+        }
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test Giỏ hàng</h1>
+        
+        <button onclick="testCartBtn()">1. Test tìm #cart-btn</button>
+        <button onclick="testCartSidebar()">2. Test tìm #cart-sidebar</button>
+        <button onclick="testDisplayCart()">3. Test displayCart()</button>
+        <button onclick="addTestProduct()">4. Thêm sản phẩm test</button>
+        <button onclick="openCart()">5. Mở giỏ hàng</button>
+        <button onclick="clearAll()">Xóa tất cả</button>
+        
+        <div id="result" class="result"></div>
+    </div>
+
+    <script>
+        function log(msg, isError = false) {
+            const result = document.getElementById('result');
+            const className = isError ? 'error' : 'success';
+            result.innerHTML += `<div class="${className}">${msg}</div>`;
+        }
+
+        function clearResult() {
+            document.getElementById('result').innerHTML = '';
+        }
+
+        function testCartBtn() {
+            clearResult();
+            const cartBtn = document.getElementById('cart-btn');
+            if (cartBtn) {
+                log('✅ Tìm thấy #cart-btn');
+                log('   Class: ' + cartBtn.className);
+                log('   HTML: ' + cartBtn.outerHTML.substring(0, 100) + '...');
+            } else {
+                log('❌ Không tìm thấy #cart-btn', true);
+            }
+        }
+
+        function testCartSidebar() {
+            clearResult();
+            const cartSidebar = document.getElementById('cart-sidebar');
+            if (cartSidebar) {
+                log('✅ Tìm thấy #cart-sidebar');
+                log('   Class: ' + cartSidebar.className);
+                log('   Display: ' + getComputedStyle(cartSidebar).display);
+                log('   Opacity: ' + getComputedStyle(cartSidebar).opacity);
+                log('   Visibility: ' + getComputedStyle(cartSidebar).visibility);
+                
+                const backdrop = cartSidebar.querySelector('.sidebar-backdrop');
+                if (backdrop) {
+                    log('✅ Tìm thấy sidebar-backdrop');
+                } else {
+                    log('❌ Không tìm thấy sidebar-backdrop', true);
+                }
+                
+                const content = cartSidebar.querySelector('.sidebar-content');
+                if (content) {
+                    log('✅ Tìm thấy sidebar-content');
+                    log('   Display: ' + getComputedStyle(content).display);
+                } else {
+                    log('❌ Không tìm thấy sidebar-content', true);
+                }
+            } else {
+                log('❌ Không tìm thấy #cart-sidebar', true);
+            }
+        }
+
+        function testDisplayCart() {
+            clearResult();
+            try {
+                if (typeof displayCart !== 'undefined') {
+                    log('✅ displayCart() tồn tại');
+                    displayCart();
+                    log('✅ displayCart() được gọi thành công');
+                } else {
+                    log('❌ displayCart() không tồn tại', true);
+                }
+            } catch (e) {
+                log('❌ Lỗi: ' + e.message, true);
+            }
+        }
+
+        function addTestProduct() {
+            clearResult();
+            const testProduct = {
+                id: 999,
+                name: 'Test Product',
+                price: 1000000,
+                image: 'https://via.placeholder.com/100',
+                quantity: 2
+            };
+            
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            cart.push(testProduct);
+            localStorage.setItem('cart', JSON.stringify(cart));
+            
+            log('✅ Thêm sản phẩm test vào localStorage');
+            log('   ID: 999');
+            log('   Tên: Test Product');
+            log('   Giá: 1,000,000 đ');
+            log('   Số lượng: 2');
+            log('✅ Tổng sản phẩm: ' + cart.length);
+        }
+
+        function openCart() {
+            clearResult();
+            const cartSidebar = document.getElementById('cart-sidebar');
+            if (cartSidebar) {
+                log('Gọi displayCart()...');
+                try {
+                    displayCart();
+                    log('✅ displayCart() thành công');
+                } catch (e) {
+                    log('❌ displayCart() lỗi: ' + e.message, true);
+                }
+                
+                log('Thêm class "active"...');
+                cartSidebar.classList.add('active');
+                log('✅ Class "active" được thêm');
+                
+                log('Kiểm tra class hiện tại: ' + cartSidebar.className);
+                
+                document.body.style.overflow = 'hidden';
+                log('✅ Giỏ hàng được mở!');
+            } else {
+                log('❌ Không tìm thấy #cart-sidebar', true);
+            }
+        }
+
+        function clearAll() {
+            clearResult();
+            localStorage.removeItem('cart');
+            const cartSidebar = document.getElementById('cart-sidebar');
+            if (cartSidebar) {
+                cartSidebar.classList.remove('active');
+            }
+            document.body.style.overflow = 'auto';
+            log('✅ Đã xóa tất cả & đóng giỏ hàng');
+        }
+
+        // Auto test khi load
+        window.onload = function() {
+            log('🧪 Các test có sẵn bên trên!');
+            log('Thực hiện từng bước để debug...');
+        };
+    </script>
+</body>
+</html>

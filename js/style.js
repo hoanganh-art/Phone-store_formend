@@ -1,7 +1,9 @@
 // CẤU HÌNH API
 const API_BASE_URL = "http://127.0.0.1:6345";
 const USE_API = true; // Đặt false để sử dụng dữ liệu tĩnh, true để dùng API
-const AUTO_REFRESH_INTERVAL = 1000; // Tự động làm mới mỗi 1 giây (1000ms)
+const AUTO_REFRESH_INTERVAL = 30000; // Tự động làm mới mỗi 30 giây (30000ms)
+const SHOW_RANDOM_PRODUCTS = true; // Hiển thị chỉ sản phẩm ngẫu nhiên (5-6 sản phẩm)
+const RANDOM_PRODUCTS_COUNT = 6; // Số sản phẩm ngẫu nhiên hiển thị
 
 const API_ENDPOINTS = {
     PRODUCTS: {
@@ -99,6 +101,25 @@ const FALLBACK_PRODUCTS = [
     }
 ];
 
+// Hàm rút gọn mô tả sản phẩm
+function truncateDescription(description, maxLength = 120) {
+    if (!description) return '';
+    if (description.length <= maxLength) return description;
+    return description.substring(0, maxLength).trim() + '...';
+}
+
+// Hàm chọn sản phẩm ngẫu nhiên
+function getRandomProducts(products, count = RANDOM_PRODUCTS_COUNT) {
+    if (!products || products.length === 0) return [];
+    
+    // Nếu sản phẩm ít hơn count, trả về tất cả
+    if (products.length <= count) return products;
+    
+    // Shuffle mảng và lấy count sản phẩm đầu tiên
+    const shuffled = [...products].sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, count);
+}
+
 // Hàm gọi API với xử lý lỗi tốt hơn
 async function fetchAPI(endpoint, options = {}) {
     try {
@@ -160,76 +181,78 @@ async function loadProducts(filter = {}, showLoading = true) {
     }
     
     try {
-        // Tạo query string từ filter
-        const queryParams = new URLSearchParams();
-        if (filter.search) queryParams.append('search', filter.search);
-        if (filter.brand) queryParams.append('brand_id', filter.brand);
-        if (filter.category) queryParams.append('category_id', filter.category);
-        if (filter.minPrice) queryParams.append('min_price', filter.minPrice);
-        if (filter.maxPrice) queryParams.append('max_price', filter.maxPrice);
-        if (filter.sortBy) queryParams.append('sort_by', filter.sortBy);
+        // Lấy dữ liệu từ tất cả trang (vì API có pagination)
+        let allData = [];
+        let pageNum = 1;
+        let totalPages = 1;
         
-        const queryString = queryParams.toString();
-        const url = queryString 
-            ? `${API_ENDPOINTS.products}?${queryString}`
-            : API_ENDPOINTS.products;
+        // Load trang 1
+        let response1 = await fetch(API_ENDPOINTS.products);
+        let data1 = await response1.json();
         
-        console.log('API URL:', url);
-        
-        const result = await fetchAPI(url);
-        
-        console.log('🔍 Debug - result:', result);
-        console.log('🔍 Debug - result.data:', result.data);
-        
-        if (result.success && result.data) {
-            // fetchAPI trả về: { success: true, data: responseBody }
-            // responseBody từ Laravel: { success: true, data: { data: [...products...], current_page, ... } }
-            let products = [];
+        if (data1.success && data1.data && data1.data.data) {
+            allData = [...data1.data.data];
+            totalPages = data1.data.last_page || 1;
+            console.log(`📄 Trang 1: ${allData.length} sản phẩm, Total pages: ${totalPages}`);
             
-            // Case 1: Response có cấu trúc { success: true, data: { data: [...] } }
-            if (result.data.success && result.data.data && result.data.data.data) {
-                products = result.data.data.data;
-                console.log('✅ Case 1: Laravel pagination format');
+            // Nếu có trang 2, load thêm
+            if (totalPages > 1) {
+                let response2 = await fetch(`${API_ENDPOINTS.products}?page=2`);
+                let data2 = await response2.json();
+                if (data2.success && data2.data && data2.data.data) {
+                    allData = [...allData, ...data2.data.data];
+                    console.log(`📄 Trang 2: +${data2.data.data.length} sản phẩm`);
+                }
             }
-            // Case 2: Response có cấu trúc { data: { data: [...] } }
-            else if (result.data.data && Array.isArray(result.data.data)) {
-                products = result.data.data;
-                console.log('✅ Case 2: Nested data format');
-            }
-            // Case 3: Response là mảng trực tiếp { data: [...] }
-            else if (Array.isArray(result.data)) {
-                products = result.data;
-                console.log('✅ Case 3: Direct array format');
+        }
+        
+        console.log('🔍 Debug - result.data:', data1);
+        
+        if (allData.length > 0) {
+            console.log('✅ Đã tải được', allData.length, 'sản phẩm từ API');
+            if (allData.length > 0) {
+                console.log('📦 Sản phẩm đầu tiên:', allData[0]);
             }
             
-            console.log('✅ Đã tải được', products.length, 'sản phẩm từ API');
-            if (products.length > 0) {
-                console.log('📦 Sản phẩm đầu tiên:', products[0]);
+            // Nếu cấu hình hiển thị ngẫu nhiên, chọn 5-6 sản phẩm random
+            let productsToDisplay = allData;
+            if (SHOW_RANDOM_PRODUCTS) {
+                productsToDisplay = getRandomProducts(allData);
+                console.log(`🎲 Chọn ${productsToDisplay.length} sản phẩm ngẫu nhiên`);
             }
             
-            displayProducts(products);
+            displayProducts(productsToDisplay, false); // false = không phải từ filter
+            updateFilterButtons('all'); // Reset về "Tất cả"
             updateProductCount(products.length);
         } else {
             // Sử dụng fallback data khi API lỗi
             console.warn('⚠️ API lỗi, sử dụng dữ liệu dự phòng');
-            displayProducts(FALLBACK_PRODUCTS);
+            displayProducts(FALLBACK_PRODUCTS, false);
             updateProductCount(FALLBACK_PRODUCTS.length);
+            updateFilterButtons('all');
             showNotification('Đang sử dụng dữ liệu demo (API không khả dụng)', 'warning');
         }
     } catch (error) {
         console.error('Lỗi khi tải sản phẩm:', error);
         // Sử dụng fallback data khi có lỗi
         console.warn('Lỗi kết nối, sử dụng dữ liệu dự phòng');
-        displayProducts(FALLBACK_PRODUCTS);
+        displayProducts(FALLBACK_PRODUCTS, false);
         updateProductCount(FALLBACK_PRODUCTS.length);
+        updateFilterButtons('all');
         showNotification('Đang sử dụng dữ liệu demo (Lỗi kết nối API)', 'warning');
     }
 }
 
 // Hiển thị sản phẩm lên grid
-function displayProducts(products) {
+function displayProducts(products, isFiltered = false) {
     const productsGrid = document.getElementById('products-grid');
     if (!productsGrid) return;
+    
+    // Lưu sản phẩm hiển thị cuối cùng để có thể filter
+    if (!isFiltered && products.length > 0) {
+        allProducts = products;
+        console.log('💾 Lưu toàn bộ sản phẩm:', allProducts.length);
+    }
     
     if (!products || products.length === 0) {
         productsGrid.innerHTML = `
@@ -282,7 +305,7 @@ function displayProducts(products) {
                 <div class="product-brand">${brandName}</div>
                 <h3 class="product-title">${productName}</h3>
                 
-                <p class="product-description">${product.description || product.short_description || ''}</p>
+                <p class="product-description" title="${(product.description || product.short_description || '').substring(0, 200)}">${truncateDescription(product.description || product.short_description || '', 120)}</p>
                 
                 ${ram || storage ? `
                 <div class="product-specs">
@@ -575,6 +598,110 @@ function updateCartCount() {
     }
 }
 
+// Hiển thị giỏ hàng
+function displayCart() {
+    const cartSidebar = document.getElementById('cart-sidebar');
+    const cartItems = document.getElementById('cart-items');
+    const cartTotal = document.getElementById('cart-total');
+    
+    if (!cartSidebar || !cartItems) return;
+    
+    // Lấy giỏ hàng từ localStorage
+    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    
+    // Nếu giỏ hàng rỗng
+    if (cart.length === 0) {
+        cartItems.innerHTML = `
+            <div class="empty-cart">
+                <i class="fas fa-shopping-cart"></i>
+                <p>Giỏ hàng trống</p>
+                <p style="font-size: 12px; color: #999;">Hãy thêm sản phẩm để tiếp tục</p>
+            </div>
+        `;
+        if (cartTotal) cartTotal.textContent = '0 đ';
+        return;
+    }
+    
+    // Hiển thị từng sản phẩm
+    let totalPrice = 0;
+    const cartHTML = cart.map(item => {
+        const itemTotal = item.price * item.quantity;
+        totalPrice += itemTotal;
+        
+        return `
+            <div class="cart-item">
+                <img src="${item.image}" alt="${item.name}">
+                <div class="cart-item-info">
+                    <h4>${item.name}</h4>
+                    <p class="cart-item-price">${formatPrice(item.price)}</p>
+                    <div class="cart-item-quantity">
+                        <button class="qty-btn" onclick="changeQuantity(${item.id}, -1)">-</button>
+                        <input type="number" value="${item.quantity}" min="1" onchange="setQuantity(${item.id}, this.value)">
+                        <button class="qty-btn" onclick="changeQuantity(${item.id}, 1)">+</button>
+                    </div>
+                </div>
+                <div class="cart-item-total">
+                    <p>${formatPrice(itemTotal)}</p>
+                    <button class="btn-remove" onclick="removeFromCart(${item.id})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    cartItems.innerHTML = cartHTML;
+    
+    // Cập nhật tổng tiền
+    if (cartTotal) {
+        cartTotal.textContent = formatPrice(totalPrice);
+    }
+}
+
+// Thay đổi số lượng sản phẩm
+function changeQuantity(productId, change) {
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const item = cart.find(item => item.id === productId);
+    
+    if (item) {
+        item.quantity += change;
+        if (item.quantity <= 0) {
+            cart = cart.filter(item => item.id !== productId);
+        }
+        localStorage.setItem('cart', JSON.stringify(cart));
+        updateCartCount();
+        displayCart();
+    }
+}
+
+// Set số lượng cụ thể
+function setQuantity(productId, quantity) {
+    const qty = parseInt(quantity) || 1;
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const item = cart.find(item => item.id === productId);
+    
+    if (item) {
+        if (qty <= 0) {
+            cart = cart.filter(item => item.id !== productId);
+        } else {
+            item.quantity = qty;
+        }
+        localStorage.setItem('cart', JSON.stringify(cart));
+        updateCartCount();
+        displayCart();
+    }
+}
+
+// Xóa sản phẩm khỏi giỏ
+function removeFromCart(productId) {
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    cart = cart.filter(item => item.id !== productId);
+    localStorage.setItem('cart', JSON.stringify(cart));
+    updateCartCount();
+    displayCart();
+    showNotification('Đã xóa khỏi giỏ hàng', 'success');
+}
+
 // Cập nhật số lượng yêu thích
 function updateWishlistCount() {
     const wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
@@ -630,7 +757,67 @@ function searchProducts(keyword) {
     loadProducts({ search: keyword });
 }
 
-// Hàm bật tự động làm mới
+// Lưu toàn bộ sản phẩm để filter client-side
+let allProducts = [];
+
+// Mapping brand name sang brand_id
+const brandMapping = {
+    'iphone': { id: 1, name: 'Apple' },
+    'samsung': { id: 2, name: 'Samsung' },
+    'xiaomi': { id: 3, name: 'Xiaomi' },
+    'google': { id: 4, name: 'Google' },
+    'all': { id: null, name: 'Tất cả' }
+};
+
+// Hàm filter sản phẩm theo brand
+function filterByBrand(brandKey) {
+    console.log('🔍 Filter by:', brandKey);
+    
+    if (brandKey === 'all') {
+        console.log('📦 Hiển thị tất cả sản phẩm:', allProducts.length);
+        // Áp dụng random nếu cấu hình
+        let productsToShow = allProducts;
+        if (SHOW_RANDOM_PRODUCTS) {
+            productsToShow = getRandomProducts(allProducts);
+            console.log(`🎲 Chọn ${productsToShow.length} sản phẩm ngẫu nhiên từ ${allProducts.length}`);
+        }
+        displayProducts(productsToShow, true);
+        return;
+    }
+    
+    const brand = brandMapping[brandKey];
+    if (!brand) {
+        console.warn('❌ Brand không tìm thấy:', brandKey);
+        return;
+    }
+    
+    // Filter sản phẩm có brand_id khớp
+    const filtered = allProducts.filter(product => {
+        const productBrandId = product.brand_id || product.brand?.id;
+        return productBrandId == brand.id;
+    });
+    
+    console.log(`✅ Lọc ${brand.name}: ${filtered.length} sản phẩm`);
+    // Áp dụng random nếu cấu hình
+    let productsToShow = filtered;
+    if (SHOW_RANDOM_PRODUCTS) {
+        productsToShow = getRandomProducts(filtered);
+        console.log(`🎲 Chọn ${productsToShow.length} sản phẩm ngẫu nhiên từ ${filtered.length}`);
+    }
+    displayProducts(productsToShow, true);
+}
+
+// Cập nhật active state của filter buttons
+function updateFilterButtons(activeFilter = 'all') {
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        const filterValue = btn.dataset.filter;
+        if (filterValue === activeFilter) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
+}
 function startAutoRefresh() {
     // Xóa interval cũ nếu có
     if (autoRefreshIntervalId) {
@@ -670,6 +857,37 @@ document.addEventListener('DOMContentLoaded', function() {
     // Bật auto-refresh
     startAutoRefresh();
     
+    // Event listener cho icon giỏ hàng
+    const cartBtn = document.getElementById('cart-btn');
+    const cartSidebar = document.getElementById('cart-sidebar');
+    const closeCartBtn = document.getElementById('close-cart');
+    const sidebarBackdrop = cartSidebar?.querySelector('.sidebar-backdrop');
+    
+    if (cartBtn) {
+        cartBtn.addEventListener('click', () => {
+            console.log('Click giỏ hàng - mở sidebar');
+            displayCart(); // Hiển thị giỏ hàng
+            cartSidebar?.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+    }
+    
+    if (closeCartBtn) {
+        closeCartBtn.addEventListener('click', () => {
+            console.log('Đóng giỏ hàng');
+            cartSidebar?.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        });
+    }
+    
+    if (sidebarBackdrop) {
+        sidebarBackdrop.addEventListener('click', () => {
+            console.log('Click backdrop - đóng sidebar');
+            cartSidebar?.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        });
+    }
+    
     // Thêm event listener cho tìm kiếm
     const searchInput = document.querySelector('.search-input');
     const searchBtn = document.querySelector('.search-btn');
@@ -707,15 +925,17 @@ document.addEventListener('DOMContentLoaded', function() {
     // Thêm event listener cho filter buttons
     document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-            const filter = btn.dataset.filter;
-            if (filter === 'all') {
-                loadProducts();
-            } else {
-                // Giả sử filter là brand name, cần chuyển đổi sang brand ID
-                // Tạm thời load tất cả và filter client-side
-                console.log('Filter by:', filter);
-                // Trong thực tế, cần gọi API với brand_id
-            }
+            const filterValue = btn.dataset.filter;
+            console.log('🔘 Click filter button:', filterValue);
+            
+            // Cập nhật active state
+            updateFilterButtons(filterValue);
+            
+            // Filter sản phẩm
+            filterByBrand(filterValue);
+            
+            // Cuộn lên đầu trang
+            document.getElementById('products-grid')?.scrollIntoView({ behavior: 'smooth' });
         });
     });
     

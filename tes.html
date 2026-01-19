@@ -1,0 +1,1622 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thanh toán | PhoneStore</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        /* Additional styles for checkout page */
+        .page-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            padding: 100px 0 60px;
+            margin-bottom: 60px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('https://images.unsplash.com/photo-1563013544-824ae1b704d3?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80') center/cover;
+            opacity: 0.1;
+        }
+
+        .page-header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .page-header h1 {
+            font-size: 48px;
+            font-weight: 800;
+            margin-bottom: 16px;
+        }
+
+        .page-header p {
+            font-size: 18px;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .breadcrumb {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            margin-top: 30px;
+            font-size: 14px;
+        }
+
+        .breadcrumb a {
+            color: rgba(255, 255, 255, 0.8);
+            transition: var(--transition-normal);
+        }
+
+        .breadcrumb a:hover {
+            color: white;
+        }
+
+        .breadcrumb i {
+            font-size: 12px;
+            opacity: 0.6;
+        }
+
+        .checkout-container {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 40px;
+            margin-bottom: 80px;
+        }
+
+        .checkout-section {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-xl);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 25px;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-title i {
+            color: var(--primary);
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 14px;
+        }
+
+        .required::after {
+            content: ' *';
+            color: var(--danger);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid var(--gray-light);
+            border-radius: var(--radius-lg);
+            font-size: 15px;
+            transition: var(--transition-normal);
+            background: white;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
+        }
+
+        .form-control.error {
+            border-color: var(--danger);
+        }
+
+        .error-message {
+            color: var(--danger);
+            font-size: 13px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        /* Payment Methods */
+        .payment-methods {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .payment-method {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 20px;
+            border: 2px solid var(--gray-light);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: var(--transition-normal);
+            background: white;
+        }
+
+        .payment-method:hover {
+            border-color: var(--primary-light);
+            background: var(--primary-light);
+        }
+
+        .payment-method.selected {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .payment-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-lg);
+            background: var(--gray-lightest);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: var(--primary);
+        }
+
+        .payment-info h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: var(--dark);
+        }
+
+        .payment-info p {
+            font-size: 13px;
+            color: var(--gray);
+        }
+
+        /* Order Summary */
+        .order-summary {
+            position: sticky;
+            top: 100px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-xl);
+            padding: 30px;
+            height: fit-content;
+        }
+
+        .summary-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 25px;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .summary-title i {
+            color: var(--primary);
+        }
+
+        .order-items {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 25px;
+            padding-right: 10px;
+        }
+
+        .order-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--gray-light);
+        }
+
+        .order-item:last-child {
+            border-bottom: none;
+        }
+
+        .order-item-image {
+            width: 60px;
+            height: 60px;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            background: var(--gray-lightest);
+        }
+
+        .order-item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .order-item-info {
+            flex: 1;
+        }
+
+        .order-item-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: var(--dark);
+        }
+
+        .order-item-price {
+            font-size: 14px;
+            color: var(--gray);
+        }
+
+        .order-item-quantity {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .summary-details {
+            margin: 25px 0;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            font-size: 15px;
+        }
+
+        .summary-row.total {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid var(--gray-light);
+        }
+
+        .summary-row .label {
+            color: var(--gray);
+        }
+
+        .summary-row .value {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .summary-row.total .value {
+            font-size: 24px;
+            color: var(--primary);
+        }
+
+        .promo-code {
+            margin-bottom: 25px;
+        }
+
+        .promo-input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .promo-input-group input {
+            flex: 1;
+        }
+
+        .terms-agreement {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 25px;
+            padding: 16px;
+            background: var(--gray-lightest);
+            border-radius: var(--radius-lg);
+        }
+
+        .terms-agreement input[type="checkbox"] {
+            margin-top: 4px;
+        }
+
+        .terms-agreement label {
+            font-weight: normal;
+            font-size: 14px;
+            margin-bottom: 0;
+        }
+
+        .terms-agreement a {
+            color: var(--primary);
+            text-decoration: underline;
+        }
+
+        .checkout-btn {
+            width: 100%;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .checkout-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Order Success Modal */
+        .order-success-modal .modal-content {
+            max-width: 500px;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--success-light);
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 36px;
+            color: var(--success);
+        }
+
+        .order-success-modal h3 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--dark);
+        }
+
+        .order-success-modal p {
+            color: var(--gray);
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .order-details {
+            background: var(--gray-lightest);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            margin: 30px 0;
+            text-align: left;
+        }
+
+        .order-detail-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .order-detail-item:last-child {
+            margin-bottom: 0;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .order-actions {
+            display: flex;
+            gap: 16px;
+            margin-top: 30px;
+        }
+
+        .order-actions .btn {
+            flex: 1;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .checkout-container {
+                grid-template-columns: 1fr;
+            }
+
+            .order-summary {
+                position: static;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .page-header h1 {
+                font-size: 36px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .payment-method {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .order-actions {
+                flex-direction: column;
+            }
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            display: none;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid var(--gray-light);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-text {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="../index.html" class="logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <span>Phone<span class="text-gradient">Store</span></span>
+                </a>
+
+                <nav class="nav-menu">
+                    <ul>
+                        <li><a href="../index.html" class="nav-link">Trang chủ</a></li>
+                        <li><a href="/home/products.html" class="nav-link">Sản phẩm</a></li>
+                        <li><a href="/home/brands.html" class="nav-link">Thương hiệu</a></li>
+                        <li><a href="/Promotion/Promotion.html" class="nav-link">Khuyến mãi</a></li>
+                        <li><a href="/services/services.html" class="nav-link">Dịch vụ</a></li>
+                        <li><a href="/index.html#contact" class="nav-link">Liên hệ</a></li>
+                    </ul>
+                </nav>
+
+                <div class="header-actions">
+                    <div class="action-buttons">
+                        <button class="theme-toggle" id="theme-toggle">
+                            <i class="fas fa-moon"></i>
+                        </button>
+                        <button class="btn-icon" id="wishlist-btn">
+                            <i class="far fa-heart"></i>
+                            <span class="badge" id="wishlist-count">0</span>
+                        </button>
+                        <button class="btn-icon" id="cart-btn">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span class="badge" id="cart-count">0</span>
+                        </button>
+                        <button class="btn-icon" id="user-btn">
+                            <i class="far fa-user"></i>
+                        </button>
+                    </div>
+
+                    <button class="mobile-toggle" id="mobile-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <div class="container">
+            <div class="page-header-content text-center">
+                <h1 class="animate__animated animate__fadeInDown">Thanh toán</h1>
+                <p class="animate__animated animate__fadeInUp animate__delay-1s">
+                    Hoàn tất đơn hàng của bạn với các bước đơn giản và an toàn
+                </p>
+                <div class="breadcrumb animate__animated animate__fadeInUp animate__delay-2s">
+                    <a href="../index.html">Trang chủ</a>
+                    <i class="fas fa-chevron-right"></i>
+                    <a href="/home/products.html">Sản phẩm</a>
+                    <i class="fas fa-chevron-right"></i>
+                    <span>Thanh toán</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Checkout Content -->
+    <section class="checkout-page">
+        <div class="container">
+            <div class="checkout-container">
+                <!-- Left Column: Forms -->
+                <div class="checkout-forms">
+                    <!-- Customer Information -->
+                    <div class="checkout-section">
+                        <h2 class="section-title">
+                            <i class="fas fa-user"></i>
+                            Thông tin khách hàng
+                        </h2>
+                        <div class="form-group">
+                            <label for="fullname" class="required">Họ và tên</label>
+                            <input type="text" id="fullname" class="form-control" placeholder="Nguyễn Văn A">
+                            <div class="error-message" id="fullname-error">Vui lòng nhập họ và tên</div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="email" class="required">Email</label>
+                                <input type="email" id="email" class="form-control" placeholder="example@email.com">
+                                <div class="error-message" id="email-error">Vui lòng nhập email hợp lệ</div>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone" class="required">Số điện thoại</label>
+                                <input type="tel" id="phone" class="form-control" placeholder="0912 345 678">
+                                <div class="error-message" id="phone-error">Vui lòng nhập số điện thoại hợp lệ</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Shipping Address -->
+                    <div class="checkout-section">
+                        <h2 class="section-title">
+                            <i class="fas fa-map-marker-alt"></i>
+                            Địa chỉ giao hàng
+                        </h2>
+                        <div class="form-group">
+                            <label for="address" class="required">Địa chỉ</label>
+                            <input type="text" id="address" class="form-control" placeholder="Số nhà, tên đường">
+                            <div class="error-message" id="address-error">Vui lòng nhập địa chỉ</div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="city" class="required">Tỉnh/Thành phố</label>
+                                <select id="city" class="form-control">
+                                    <option value="">Chọn tỉnh/thành phố</option>
+                                    <option value="hcm">TP. Hồ Chí Minh</option>
+                                    <option value="hn">Hà Nội</option>
+                                    <option value="dn">Đà Nẵng</option>
+                                    <option value="hue">Huế</option>
+                                    <option value="nt">Nha Trang</option>
+                                    <option value="ct">Cần Thơ</option>
+                                </select>
+                                <div class="error-message" id="city-error">Vui lòng chọn tỉnh/thành phố</div>
+                            </div>
+                            <div class="form-group">
+                                <label for="district" class="required">Quận/Huyện</label>
+                                <select id="district" class="form-control" disabled>
+                                    <option value="">Chọn quận/huyện</option>
+                                </select>
+                                <div class="error-message" id="district-error">Vui lòng chọn quận/huyện</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="note">Ghi chú giao hàng (tùy chọn)</label>
+                            <textarea id="note" class="form-control" rows="3"
+                                placeholder="Ví dụ: Giao hàng giờ hành chính, gọi điện trước khi giao..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Payment Method -->
+                    <div class="checkout-section">
+                        <h2 class="section-title">
+                            <i class="fas fa-credit-card"></i>
+                            Phương thức thanh toán
+                        </h2>
+                        <div class="payment-methods">
+                            <div class="payment-method selected" data-method="cod">
+                                <div class="payment-icon">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                </div>
+                                <div class="payment-info">
+                                    <h4>Thanh toán khi nhận hàng (COD)</h4>
+                                    <p>Thanh toán bằng tiền mặt khi nhận được hàng</p>
+                                </div>
+                            </div>
+
+                            <div class="payment-method" data-method="banking">
+                                <div class="payment-icon">
+                                    <i class="fas fa-university"></i>
+                                </div>
+                                <div class="payment-info">
+                                    <h4>Chuyển khoản ngân hàng</h4>
+                                    <p>Chuyển khoản qua ngân hàng trước khi giao hàng</p>
+                                </div>
+                            </div>
+
+                            <div class="payment-method" data-method="momo">
+                                <div class="payment-icon">
+                                    <i class="fas fa-mobile-alt"></i>
+                                </div>
+                                <div class="payment-info">
+                                    <h4>Ví MoMo</h4>
+                                    <p>Thanh toán qua ứng dụng MoMo</p>
+                                </div>
+                            </div>
+
+                            <div class="payment-method" data-method="vnpay">
+                                <div class="payment-icon">
+                                    <i class="fas fa-qrcode"></i>
+                                </div>
+                                <div class="payment-info">
+                                    <h4>VNPay</h4>
+                                    <p>Thanh toán qua cổng VNPay</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Payment Details -->
+                        <div class="payment-details" id="banking-details" style="display: none; margin-top: 20px;">
+                            <div class="bank-info">
+                                <h4 style="margin-bottom: 16px; color: var(--dark);">Thông tin chuyển khoản:</h4>
+                                <div style="background: var(--gray-lightest); padding: 20px; border-radius: var(--radius-lg);">
+                                    <div class="bank-detail">
+                                        <strong>Ngân hàng:</strong> Techcombank
+                                    </div>
+                                    <div class="bank-detail">
+                                        <strong>Số tài khoản:</strong> 1903 7777 8888
+                                    </div>
+                                    <div class="bank-detail">
+                                        <strong>Chủ tài khoản:</strong> CÔNG TY TNHH PHONESTORE
+                                    </div>
+                                    <div class="bank-detail">
+                                        <strong>Nội dung chuyển khoản:</strong> 
+                                        <span id="transfer-content">PHONESTORE - [Mã đơn hàng]</span>
+                                    </div>
+                                    <div class="bank-note" style="margin-top: 12px; color: var(--danger); font-size: 14px;">
+                                        <i class="fas fa-exclamation-circle"></i>
+                                        Vui lòng giữ lại biên lai chuyển khoản để đối chiếu
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Order Summary -->
+                <div class="order-summary">
+                    <h2 class="summary-title">
+                        <i class="fas fa-receipt"></i>
+                        Đơn hàng của bạn
+                    </h2>
+
+                    <div class="order-items" id="order-items">
+                        <!-- Order items will be loaded here -->
+                    </div>
+
+                    <div class="summary-details">
+                        <div class="summary-row">
+                            <span class="label">Tạm tính:</span>
+                            <span class="value" id="subtotal">0 đ</span>
+                        </div>
+                        <div class="summary-row">
+                            <span class="label">Phí vận chuyển:</span>
+                            <span class="value" id="shipping-fee">30,000 đ</span>
+                        </div>
+                        <div class="summary-row">
+                            <span class="label">Giảm giá:</span>
+                            <span class="value" id="discount">0 đ</span>
+                        </div>
+                        <div class="summary-row total">
+                            <span class="label">Tổng cộng:</span>
+                            <span class="value" id="total">0 đ</span>
+                        </div>
+                    </div>
+
+                    <div class="promo-code">
+                        <label for="promo-code">Mã khuyến mãi</label>
+                        <div class="promo-input-group">
+                            <input type="text" id="promo-code" class="form-control" placeholder="Nhập mã khuyến mãi">
+                            <button class="btn btn-outline" id="apply-promo">Áp dụng</button>
+                        </div>
+                        <div class="error-message" id="promo-error"></div>
+                    </div>
+
+                    <div class="terms-agreement">
+                        <input type="checkbox" id="terms-agree">
+                        <label for="terms-agree">
+                            Tôi đã đọc và đồng ý với 
+                            <a href="#" id="terms-link">điều khoản và điều kiện</a> 
+                            của PhoneStore
+                        </label>
+                    </div>
+
+                    <button class="btn btn-primary checkout-btn" id="place-order" disabled>
+                        <i class="fas fa-lock"></i>
+                        Hoàn tất đơn hàng
+                    </button>
+
+                    <div class="secure-payment" style="text-align: center; margin-top: 16px;">
+                        <i class="fas fa-shield-alt" style="color: var(--success); margin-right: 8px;"></i>
+                        <span style="font-size: 13px; color: var(--gray);">
+                            Thanh toán an toàn & bảo mật
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer" id="contact">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-logo">
+                        <div class="footer-logo-icon">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <span>PhoneStore</span>
+                    </div>
+                    <p class="footer-description">
+                        PhoneStore - Địa chỉ tin cậy cho những chiếc điện thoại thông minh chính hãng.
+                        Cam kết chất lượng, giá cả cạnh tranh và dịch vụ hoàn hảo.
+                    </p>
+                    <div class="social-links">
+                        <a href="#" class="social-link">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="social-link">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="social-link">
+                            <i class="fab fa-tiktok"></i>
+                        </a>
+                        <a href="#" class="social-link">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="footer-col">
+                    <h4 class="footer-heading">Liên kết nhanh</h4>
+                    <ul class="footer-links">
+                        <li><a href="../index.html">
+                                <i class="fas fa-chevron-right"></i>
+                                Trang chủ
+                            </a></li>
+                        <li><a href="/home/products.html">
+                                <i class="fas fa-chevron-right"></i>
+                                Sản phẩm
+                            </a></li>
+                        <li><a href="/home/brands.html">
+                                <i class="fas fa-chevron-right"></i>
+                                Thương hiệu
+                            </a></li>
+                        <li><a href="/Promotion/Promotion.html">
+                                <i class="fas fa-chevron-right"></i>
+                                Khuyến mãi
+                            </a></li>
+                        <li><a href="/services/services.html">
+                                <i class="fas fa-chevron-right"></i>
+                                Dịch vụ
+                            </a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4 class="footer-heading">Hỗ trợ khách hàng</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">
+                                <i class="fas fa-chevron-right"></i>
+                                Chính sách bảo hành
+                            </a></li>
+                        <li><a href="#">
+                                <i class="fas fa-chevron-right"></i>
+                                Hướng dẫn mua hàng
+                            </a></li>
+                        <li><a href="#">
+                                <i class="fas fa-chevron-right"></i>
+                                Câu hỏi thường gặp
+                            </a></li>
+                        <li><a href="#">
+                                <i class="fas fa-chevron-right"></i>
+                                Chính sách đổi trả
+                            </a></li>
+                        <li><a href="#">
+                                <i class="fas fa-chevron-right"></i>
+                                Liên hệ
+                            </a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4 class="footer-heading">Liên hệ</h4>
+                    <ul class="contact-info">
+                        <li>
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>123 Nguyễn Văn Linh, Quận 7, TP.HCM</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-phone"></i>
+                            <span>1900 1234</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-envelope"></i>
+                            <span>info@phonestore.vn</span>
+                        </li>
+                    </ul>
+                    <div class="newsletter">
+                        <h4>Nhận tin khuyến mãi</h4>
+                        <p>Đăng ký để nhận thông tin khuyến mãi mới nhất</p>
+                        <div class="newsletter-form">
+                            <input type="email" placeholder="Email của bạn">
+                            <button type="submit">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <div class="copyright">
+                    &copy; 2024 PhoneStore. All rights reserved.
+                </div>
+                <div class="payment-methods">
+                    <i class="fab fa-cc-visa"></i>
+                    <i class="fab fa-cc-mastercard"></i>
+                    <i class="fab fa-cc-paypal"></i>
+                    <i class="fab fa-cc-apple-pay"></i>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Order Success Modal -->
+    <div class="modal order-success-modal" id="order-success-modal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="success-icon">
+                <i class="fas fa-check"></i>
+            </div>
+            <h3>Đặt hàng thành công!</h3>
+            <p>
+                Cảm ơn bạn đã đặt hàng tại PhoneStore. Đơn hàng của bạn đã được tiếp nhận 
+                và đang được xử lý. Bạn sẽ nhận được email xác nhận trong vài phút tới.
+            </p>
+
+            <div class="order-details" id="success-order-details">
+                <!-- Order details will be filled by JavaScript -->
+            </div>
+
+            <div class="order-actions">
+                <button class="btn btn-outline" id="view-orders">
+                    <i class="fas fa-list"></i>
+                    Xem đơn hàng
+                </button>
+                <button class="btn btn-primary" id="continue-shopping">
+                    <i class="fas fa-shopping-cart"></i>
+                    Tiếp tục mua sắm
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Đang xử lý đơn hàng...</div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notification-container"></div>
+
+    <script>
+        // Checkout Data
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
+        let selectedPaymentMethod = 'cod';
+        let promoCodeApplied = false;
+        let promoDiscount = 0;
+
+        // District data based on city
+        const districtData = {
+            hcm: [
+                { id: 'q1', name: 'Quận 1' },
+                { id: 'q2', name: 'Quận 2' },
+                { id: 'q3', name: 'Quận 3' },
+                { id: 'q4', name: 'Quận 4' },
+                { id: 'q5', name: 'Quận 5' },
+                { id: 'q6', name: 'Quận 6' },
+                { id: 'q7', name: 'Quận 7' },
+                { id: 'q8', name: 'Quận 8' },
+                { id: 'q9', name: 'Quận 9' },
+                { id: 'q10', name: 'Quận 10' }
+            ],
+            hn: [
+                { id: 'hbt', name: 'Quận Hai Bà Trưng' },
+                { id: 'hbm', name: 'Quận Hoàn Kiếm' },
+                { id: 'dd', name: 'Quận Đống Đa' },
+                { id: 'cg', name: 'Quận Cầu Giấy' },
+                { id: 'tx', name: 'Quận Thanh Xuân' },
+                { id: 'hl', name: 'Quận Hoàng Mai' },
+                { id: 'lh', name: 'Quận Long Biên' },
+                { id: 'td', name: 'Quận Tây Hồ' }
+            ],
+            dn: [
+                { id: 'hs', name: 'Quận Hải Châu' },
+                { id: 'st', name: 'Quận Sơn Trà' },
+                { id: 'nt', name: 'Quận Ngũ Hành Sơn' },
+                { id: 'll', name: 'Quận Liên Chiểu' },
+                { id: 'cm', name: 'Quận Cẩm Lệ' }
+            ]
+        };
+
+        // Promo codes
+        const promoCodes = {
+            'PHONE10': 0.1,  // 10% discount
+            'WELCOME15': 0.15, // 15% discount
+            'SAVE20': 0.2,  // 20% discount
+            'FREESHIP': 'freeship' // Free shipping
+        };
+
+        // DOM Elements
+        const orderItemsContainer = document.getElementById('order-items');
+        const subtotalElement = document.getElementById('subtotal');
+        const shippingFeeElement = document.getElementById('shipping-fee');
+        const discountElement = document.getElementById('discount');
+        const totalElement = document.getElementById('total');
+        const placeOrderBtn = document.getElementById('place-order');
+        const termsCheckbox = document.getElementById('terms-agree');
+        const paymentMethods = document.querySelectorAll('.payment-method');
+        const bankingDetails = document.getElementById('banking-details');
+        const transferContent = document.getElementById('transfer-content');
+        const citySelect = document.getElementById('city');
+        const districtSelect = document.getElementById('district');
+        const promoCodeInput = document.getElementById('promo-code');
+        const applyPromoBtn = document.getElementById('apply-promo');
+        const orderSuccessModal = document.getElementById('order-success-modal');
+        const successOrderDetails = document.getElementById('success-order-details');
+        const loadingOverlay = document.getElementById('loading-overlay');
+        const continueShoppingBtn = document.getElementById('continue-shopping');
+        const viewOrdersBtn = document.getElementById('view-orders');
+
+        // Shared elements from other pages
+        const header = document.querySelector('.header');
+        const navMenu = document.querySelector('.nav-menu');
+        const mobileToggle = document.getElementById('mobile-toggle');
+        const themeToggle = document.getElementById('theme-toggle');
+        const cartBtn = document.getElementById('cart-btn');
+        const wishlistBtn = document.getElementById('wishlist-btn');
+        const userBtn = document.getElementById('user-btn');
+        const cartCount = document.getElementById('cart-count');
+        const wishlistCount = document.getElementById('wishlist-count');
+
+        // Helper functions
+        function formatPrice(price) {
+            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
+        }
+
+        function showNotification(message, type = 'info') {
+            const container = document.getElementById('notification-container');
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+
+            const icons = {
+                success: 'fas fa-check-circle',
+                error: 'fas fa-times-circle',
+                warning: 'fas fa-exclamation-triangle',
+                info: 'fas fa-info-circle'
+            };
+
+            notification.innerHTML = `
+                <div class="notification-icon">
+                    <i class="${icons[type]}"></i>
+                </div>
+                <div class="notification-content">
+                    <div class="notification-title">Thông báo</div>
+                    <div class="notification-message">${message}</div>
+                </div>
+                <button class="notification-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+
+            container.appendChild(notification);
+
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 10);
+
+            const removeNotification = () => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            };
+
+            notification.querySelector('.notification-close').addEventListener('click', removeNotification);
+            setTimeout(removeNotification, 5000);
+        }
+
+        function updateBadges() {
+            const totalCartItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            cartCount.textContent = totalCartItems;
+            
+            // Update wishlist count
+            const wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+            wishlistCount.textContent = wishlist.length;
+        }
+
+        // Form validation
+        function validateForm() {
+            let isValid = true;
+            const errors = {};
+
+            // Full name validation
+            const fullname = document.getElementById('fullname').value.trim();
+            if (!fullname) {
+                errors.fullname = 'Vui lòng nhập họ và tên';
+                isValid = false;
+            }
+
+            // Email validation
+            const email = document.getElementById('email').value.trim();
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!email) {
+                errors.email = 'Vui lòng nhập email';
+                isValid = false;
+            } else if (!emailRegex.test(email)) {
+                errors.email = 'Email không hợp lệ';
+                isValid = false;
+            }
+
+            // Phone validation
+            const phone = document.getElementById('phone').value.trim();
+            const phoneRegex = /(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})\b/;
+            if (!phone) {
+                errors.phone = 'Vui lòng nhập số điện thoại';
+                isValid = false;
+            } else if (!phoneRegex.test(phone.replace(/\s/g, ''))) {
+                errors.phone = 'Số điện thoại không hợp lệ';
+                isValid = false;
+            }
+
+            // Address validation
+            const address = document.getElementById('address').value.trim();
+            if (!address) {
+                errors.address = 'Vui lòng nhập địa chỉ';
+                isValid = false;
+            }
+
+            // City validation
+            const city = document.getElementById('city').value;
+            if (!city) {
+                errors.city = 'Vui lòng chọn tỉnh/thành phố';
+                isValid = false;
+            }
+
+            // District validation
+            const district = document.getElementById('district').value;
+            if (!district) {
+                errors.district = 'Vui lòng chọn quận/huyện';
+                isValid = false;
+            }
+
+            // Terms agreement validation
+            if (!termsCheckbox.checked) {
+                showNotification('Vui lòng đồng ý với điều khoản và điều kiện', 'error');
+                isValid = false;
+            }
+
+            // Show errors
+            Object.keys(errors).forEach(field => {
+                const errorElement = document.getElementById(`${field}-error`);
+                const inputElement = document.getElementById(field);
+                if (errorElement && inputElement) {
+                    errorElement.textContent = errors[field];
+                    errorElement.classList.add('show');
+                    inputElement.classList.add('error');
+                }
+            });
+
+            // Clear errors for valid fields
+            const allFields = ['fullname', 'email', 'phone', 'address', 'city', 'district'];
+            allFields.forEach(field => {
+                if (!errors[field]) {
+                    const errorElement = document.getElementById(`${field}-error`);
+                    const inputElement = document.getElementById(field);
+                    if (errorElement && inputElement) {
+                        errorElement.classList.remove('show');
+                        inputElement.classList.remove('error');
+                    }
+                }
+            });
+
+            return isValid;
+        }
+
+        // Clear form errors
+        function clearFormErrors() {
+            const errorElements = document.querySelectorAll('.error-message');
+            const inputElements = document.querySelectorAll('.form-control');
+            
+            errorElements.forEach(el => el.classList.remove('show'));
+            inputElements.forEach(el => el.classList.remove('error'));
+        }
+
+        // Calculate order summary
+        function calculateOrderSummary() {
+            if (cart.length === 0) {
+                subtotalElement.textContent = '0 đ';
+                shippingFeeElement.textContent = '0 đ';
+                discountElement.textContent = '0 đ';
+                totalElement.textContent = '0 đ';
+                return;
+            }
+
+            let subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            let shippingFee = 30000; // Default shipping fee
+            let discount = 0;
+
+            // Apply promo discount
+            if (promoCodeApplied) {
+                if (typeof promoDiscount === 'number') {
+                    discount = subtotal * promoDiscount;
+                } else if (promoDiscount === 'freeship') {
+                    shippingFee = 0;
+                }
+            }
+
+            const total = subtotal + shippingFee - discount;
+
+            subtotalElement.textContent = formatPrice(subtotal);
+            shippingFeeElement.textContent = formatPrice(shippingFee);
+            discountElement.textContent = formatPrice(discount);
+            totalElement.textContent = formatPrice(total);
+        }
+
+        // Render order items
+        function renderOrderItems() {
+            orderItemsContainer.innerHTML = '';
+
+            if (cart.length === 0) {
+                orderItemsContainer.innerHTML = `
+                    <div style="text-align: center; padding: 40px 20px;">
+                        <i class="fas fa-shopping-cart" style="font-size: 48px; color: var(--gray); margin-bottom: 16px;"></i>
+                        <h4 style="color: var(--dark); margin-bottom: 8px;">Giỏ hàng trống</h4>
+                        <p style="color: var(--gray); margin-bottom: 20px;">Hãy thêm sản phẩm vào giỏ hàng trước khi thanh toán</p>
+                        <a href="/home/products.html" class="btn btn-primary">
+                            <i class="fas fa-shopping-bag"></i>
+                            Mua sắm ngay
+                        </a>
+                    </div>
+                `;
+                placeOrderBtn.disabled = true;
+                return;
+            }
+
+            cart.forEach(item => {
+                const orderItem = document.createElement('div');
+                orderItem.className = 'order-item';
+                orderItem.innerHTML = `
+                    <div class="order-item-image">
+                        <img src="${item.image}" alt="${item.name}" loading="lazy">
+                    </div>
+                    <div class="order-item-info">
+                        <div class="order-item-name">${item.name}</div>
+                        <div class="order-item-price">${formatPrice(item.price)}</div>
+                    </div>
+                    <div class="order-item-quantity">x${item.quantity}</div>
+                `;
+                orderItemsContainer.appendChild(orderItem);
+            });
+
+            placeOrderBtn.disabled = false;
+        }
+
+        // Initialize form with user data if available
+        function initializeForm() {
+            if (currentUser) {
+                document.getElementById('fullname').value = currentUser.name || '';
+                document.getElementById('email').value = currentUser.email || '';
+                document.getElementById('phone').value = currentUser.phone || '';
+                document.getElementById('address').value = currentUser.address || '';
+                
+                if (currentUser.city) {
+                    document.getElementById('city').value = currentUser.city;
+                    updateDistrictOptions();
+                    document.getElementById('district').value = currentUser.district || '';
+                }
+            }
+        }
+
+        // Update district options based on selected city
+        function updateDistrictOptions() {
+            const selectedCity = citySelect.value;
+            districtSelect.innerHTML = '<option value="">Chọn quận/huyện</option>';
+            
+            if (selectedCity && districtData[selectedCity]) {
+                districtSelect.disabled = false;
+                districtData[selectedCity].forEach(district => {
+                    const option = document.createElement('option');
+                    option.value = district.id;
+                    option.textContent = district.name;
+                    districtSelect.appendChild(option);
+                });
+            } else {
+                districtSelect.disabled = true;
+            }
+        }
+
+        // Generate order data for submission
+        function generateOrderData() {
+            const orderId = 'ORDER-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+            
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const shippingFee = promoDiscount === 'freeship' ? 0 : 30000;
+            const discount = typeof promoDiscount === 'number' ? subtotal * promoDiscount : 0;
+            const total = subtotal + shippingFee - discount;
+
+            return {
+                id: orderId,
+                date: new Date().toISOString(),
+                customer: {
+                    name: document.getElementById('fullname').value.trim(),
+                    email: document.getElementById('email').value.trim(),
+                    phone: document.getElementById('phone').value.trim(),
+                    address: document.getElementById('address').value.trim(),
+                    city: citySelect.options[citySelect.selectedIndex].text,
+                    district: districtSelect.options[districtSelect.selectedIndex].text,
+                    note: document.getElementById('note').value.trim()
+                },
+                items: cart.map(item => ({
+                    id: item.id,
+                    name: item.name,
+                    price: item.price,
+                    quantity: item.quantity,
+                    image: item.image
+                })),
+                payment: {
+                    method: selectedPaymentMethod,
+                    details: selectedPaymentMethod === 'banking' ? {
+                        bank: 'Techcombank',
+                        account: '1903 7777 8888',
+                        name: 'CÔNG TY TNHH PHONESTORE'
+                    } : null
+                },
+                summary: {
+                    subtotal: subtotal,
+                    shipping: shippingFee,
+                    discount: discount,
+                    total: total
+                },
+                status: 'pending'
+            };
+        }
+
+        // Save order to local storage
+        function saveOrder(order) {
+            let orders = JSON.parse(localStorage.getItem('orders')) || [];
+            orders.push(order);
+            localStorage.setItem('orders', JSON.stringify(orders));
+            
+            // Update user data if logged in
+            if (currentUser) {
+                currentUser.name = order.customer.name;
+                currentUser.email = order.customer.email;
+                currentUser.phone = order.customer.phone;
+                currentUser.address = order.customer.address;
+                currentUser.city = order.customer.city;
+                currentUser.district = order.customer.district;
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            }
+        }
+
+        // Display order success details
+        function displayOrderSuccess(order) {
+            successOrderDetails.innerHTML = `
+                <div class="order-detail-item">
+                    <span>Mã đơn hàng:</span>
+                    <strong>${order.id}</strong>
+                </div>
+                <div class="order-detail-item">
+                    <span>Ngày đặt:</span>
+                    <span>${new Date(order.date).toLocaleDateString('vi-VN')}</span>
+                </div>
+                <div class="order-detail-item">
+                    <span>Khách hàng:</span>
+                    <span>${order.customer.name}</span>
+                </div>
+                <div class="order-detail-item">
+                    <span>Số điện thoại:</span>
+                    <span>${order.customer.phone}</span>
+                </div>
+                <div class="order-detail-item">
+                    <span>Địa chỉ giao hàng:</span>
+                    <span>${order.customer.address}, ${order.customer.district}, ${order.customer.city}</span>
+                </div>
+                <div class="order-detail-item">
+                    <span>Phương thức thanh toán:</span>
+                    <span>${getPaymentMethodName(order.payment.method)}</span>
+                </div>
+                <div class="order-detail-item">
+                    <span>Tổng thanh toán:</span>
+                    <strong>${formatPrice(order.summary.total)}</strong>
+                </div>
+            `;
+        }
+
+        function getPaymentMethodName(method) {
+            const methods = {
+                'cod': 'Thanh toán khi nhận hàng (COD)',
+                'banking': 'Chuyển khoản ngân hàng',
+                'momo': 'Ví MoMo',
+                'vnpay': 'VNPay'
+            };
+            return methods[method] || 'Không xác định';
+        }
+
+        // Initialize the checkout page
+        function initCheckout() {
+            // Check if cart is empty
+            if (cart.length === 0) {
+                showNotification('Giỏ hàng của bạn đang trống. Vui lòng thêm sản phẩm trước khi thanh toán.', 'warning');
+                setTimeout(() => {
+                    window.location.href = '/home/products.html';
+                }, 2000);
+                return;
+            }
+
+            // Render order items and calculate summary
+            renderOrderItems();
+            calculateOrderSummary();
+            initializeForm();
+            updateBadges();
+
+            // Header scroll effect
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 100) {
+                    header.classList.add('scrolled');
+                } else {
+                    header.classList.remove('scrolled');
+                }
+            });
+
+            // Mobile menu toggle
+            mobileToggle.addEventListener('click', () => {
+                navMenu.classList.toggle('active');
+            });
+
+            // Theme toggle
+            themeToggle.addEventListener('click', () => {
+                document.body.classList.toggle('dark-theme');
+                const icon = themeToggle.querySelector('i');
+                if (document.body.classList.contains('dark-theme')) {
+                    icon.className = 'fas fa-sun';
+                    showNotification('Đã chuyển sang chế độ tối', 'info');
+                } else {
+                    icon.className = 'fas fa-moon';
+                    showNotification('Đã chuyển sang chế độ sáng', 'info');
+                }
+            });
+
+            // City selection change
+            citySelect.addEventListener('change', () => {
+                updateDistrictOptions();
+                clearFormErrors();
+            });
+
+            // District selection change
+            districtSelect.addEventListener('change', () => {
+                clearFormErrors();
+            });
+
+            // Input validation on change
+            document.querySelectorAll('.form-control').forEach(input => {
+                input.addEventListener('input', () => {
+                    clearFormErrors();
+                });
+            });
+
+            // Payment method selection
+            paymentMethods.forEach(method => {
+                method.addEventListener('click', () => {
+                    paymentMethods.forEach(m => m.classList.remove('selected'));
+                    method.classList.add('selected');
+                    selectedPaymentMethod = method.dataset.method;
+                    
+                    // Show/hide banking details
+                    if (selectedPaymentMethod === 'banking') {
+                        bankingDetails.style.display = 'block';
+                        // Generate transfer content
+                        transferContent.textContent = `PHONESTORE - ${'ORDER-' + Date.now().toString().slice(-6)}`;
+                    } else {
+                        bankingDetails.style.display = 'none';
+                    }
+                });
+            });
+
+            // Terms checkbox change
+            termsCheckbox.addEventListener('change', () => {
+                // Validation is handled on form submit
+            });
+
+            // Apply promo code
+            applyPromoBtn.addEventListener('click', () => {
+                const code = promoCodeInput.value.trim().toUpperCase();
+                const promoError = document.getElementById('promo-error');
+                
+                if (!code) {
+                    promoError.textContent = 'Vui lòng nhập mã khuyến mãi';
+                    promoError.classList.add('show');
+                    return;
+                }
+
+                if (promoCodes[code]) {
+                    promoCodeApplied = true;
+                    promoDiscount = promoCodes[code];
+                    promoError.classList.remove('show');
+                    showNotification('Áp dụng mã khuyến mãi thành công!', 'success');
+                    calculateOrderSummary();
+                    promoCodeInput.disabled = true;
+                    applyPromoBtn.disabled = true;
+                    applyPromoBtn.textContent = 'Đã áp dụng';
+                } else {
+                    promoError.textContent = 'Mã khuyến mãi không hợp lệ hoặc đã hết hạn';
+                    promoError.classList.add('show');
+                    showNotification('Mã khuyến mãi không hợp lệ', 'error');
+                }
+            });
+
+            // Place order button
+            placeOrderBtn.addEventListener('click', async () => {
+                if (!validateForm()) {
+                    showNotification('Vui lòng kiểm tra lại thông tin', 'error');
+                    return;
+                }
+
+                // Show loading overlay
+                loadingOverlay.classList.add('active');
+
+                // Simulate API call delay
+                setTimeout(() => {
+                    // Generate order data
+                    const order = generateOrderData();
+                    
+                    // Save order
+                    saveOrder(order);
+                    
+                    // Clear cart
+                    cart = [];
+                    localStorage.setItem('cart', JSON.stringify(cart));
+                    
+                    // Update badges
+                    updateBadges();
+                    
+                    // Hide loading overlay
+                    loadingOverlay.classList.remove('active');
+                    
+                    // Display success modal
+                    displayOrderSuccess(order);
+                    orderSuccessModal.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                    
+                    // Show success notification
+                    showNotification('Đặt hàng thành công! Đơn hàng của bạn đang được xử lý.', 'success');
+                    
+                }, 1500);
+            });
+
+            // Order success modal actions
+            continueShoppingBtn.addEventListener('click', () => {
+                orderSuccessModal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+                window.location.href = '/home/products.html';
+            });
+
+            viewOrdersBtn.addEventListener('click', () => {
+                orderSuccessModal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+                // Redirect to orders page (to be created)
+                showNotification('Trang quản lý đơn hàng sẽ được thêm trong phiên bản tiếp theo', 'info');
+                setTimeout(() => {
+                    window.location.href = '/home/products.html';
+                }, 1500);
+            });
+
+            // Close modal on backdrop click
+            orderSuccessModal.querySelector('.modal-backdrop').addEventListener('click', () => {
+                orderSuccessModal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+
+            // User button
+            userBtn.addEventListener('click', () => {
+                if (currentUser) {
+                    showNotification(`Xin chào, ${currentUser.name}!`, 'success');
+                } else {
+                    window.location.href = 'login_regiter.html';
+                }
+            });
+
+            // Cart button
+            cartBtn.addEventListener('click', () => {
+                if (cart.length === 0) {
+                    showNotification('Giỏ hàng trống', 'info');
+                } else {
+                    showNotification('Vui lòng hoàn tất thanh toán trước khi xem giỏ hàng', 'info');
+                }
+            });
+
+            // Wishlist button
+            wishlistBtn.addEventListener('click', () => {
+                window.location.href = '/home/products.html';
+            });
+
+            // Terms link
+            document.getElementById('terms-link').addEventListener('click', (e) => {
+                e.preventDefault();
+                showNotification('Điều khoản và điều kiện sẽ được hiển thị trong cửa sổ mới', 'info');
+            });
+
+            // Auto-fill random order ID for banking transfer
+            if (selectedPaymentMethod === 'banking') {
+                transferContent.textContent = `PHONESTORE - ${'ORDER-' + Date.now().toString().slice(-6)}`;
+            }
+        }
+
+        // Start the checkout page
+        document.addEventListener('DOMContentLoaded', initCheckout);
+    </script>
+</body>
+
+</html>
